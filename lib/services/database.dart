@@ -258,6 +258,7 @@ class DatabaseService {
   }
 
   Future<String> getCorreo(String cedula) async {
+    print(cedula);
     var user = await firestore.collection("personal").where("cedula", isEqualTo: cedula).get();
     if (user.size > 0) {
       String json = jsonEncode(user.docs[0].data());
@@ -290,16 +291,20 @@ class DatabaseService {
   }
 
   Future saveNotification(String compania, String estado, String nombres, String apellidos, String horario, String parteAnterior, String idParte, String uid_personal) async {
-    DateTime now = new DateTime.now();
-    DateTime date = new DateTime(now.year, now.month, now.day);
-    String desdeString = new DateFormat("dd-MM-yyyy").format(date);
-    QuerySnapshot<Map<String, dynamic>> user = await firestore.collection("users").where("compania", isEqualTo: compania).where("type_user", isEqualTo: "Comandante de Compañía").get();
-    String id = user.docs[0].id;
-    Map<String, dynamic> dataUser = user.docs[0].data();
-    DocumentSnapshot<Map<String, dynamic>> personal = await firestore.collection("personal").doc(id).get();
-    Map<String, dynamic>? data = personal.data();
-    String token = data!["token"];
-    return await firestore.collection("notification").add({"name": "Autorización de cambio de estado en el parte", "subject": "El Sr. $nombres $apellidos desea hacer el cambio de esatado en el parte de: $horario, del dia $desdeString", "token": token, "parte_anterior": parteAnterior, "parte_nuevo": estado, "uid": dataUser["uid"], "estado": "en_espera", "create": FieldValue.serverTimestamp(), "id_parte": idParte, "atendido": false, "uid_personal": uid_personal});
+    try {
+      DateTime now = new DateTime.now();
+      DateTime date = new DateTime(now.year, now.month, now.day);
+      String desdeString = new DateFormat("dd-MM-yyyy").format(date);
+      QuerySnapshot<Map<String, dynamic>> user = await firestore.collection("users").where("compania", isEqualTo: compania).where("type_user", isEqualTo: "Comandante de Compañía").get();
+      String id = user.docs[0].id;
+      Map<String, dynamic> dataUser = user.docs[0].data();
+      DocumentSnapshot<Map<String, dynamic>> personal = await firestore.collection("personal").doc(id).get();
+      Map<String, dynamic>? data = personal.data();
+      String token = data!["token"];
+      return await firestore.collection("notification").add({"name": "Autorización de cambio de estado en el parte", "subject": "El Sr. $nombres $apellidos desea hacer el cambio de esatado en el parte de: $horario, del dia $desdeString", "token": token, "parte_anterior": parteAnterior, "parte_nuevo": estado, "uid": dataUser["uid"], "estado": "en_espera", "create": FieldValue.serverTimestamp(), "id_parte": idParte, "atendido": false, "uid_personal": uid_personal});
+    } catch (e) {
+      return false;
+    }
   }
 
   Future saveNotificationUser(bool acepted, String idUser) async {

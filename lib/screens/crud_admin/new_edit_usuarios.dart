@@ -269,7 +269,7 @@ Widget ButonUpdate(_formKey, databaseService, context, nombre, uid, uid_user, ty
         data["uid"] = uid;
         data["uid_user"] = uid_user;
         data["type_user"] = type_user;
-        data["compania"] = type_user;
+        data["compania"] = compania;
         if (_formKey.currentState!.validate()) {
           await databaseService.updateUsuarios(uid, data);
           Navigator.pop(context);

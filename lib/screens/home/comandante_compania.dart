@@ -9,6 +9,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:image_gallery_saver/image_gallery_saver.dart';
 import 'package:intl/intl.dart';
+import 'package:pdf/pdf.dart';
 import 'package:provider/provider.dart';
 import 'package:tblpartes/screens/home/personal.dart';
 import 'package:tblpartes/services/Constantes.dart';
@@ -187,7 +188,7 @@ class _ComandanteCompaniaState extends State<ComandanteCompania> {
   }
 
   final pdfs = pw.Document();
-
+  bool generando = false;
   List<pw.TableRow> getList() {
     final pdf = pw.Document();
     List<pw.TableRow> childs = [
@@ -202,8 +203,8 @@ class _ComandanteCompaniaState extends State<ComandanteCompania> {
     return childs;
   }
 
-  List<pw.TableRow> getListTotal() {
-    final pdf = pw.Document();
+  int con = 1;
+  List<pw.TableRow> getListTotal(listaFor) {
     List<pw.TableRow> childs = [
       pw.TableRow(children: [
         pw.Text("#"),
@@ -216,22 +217,98 @@ class _ComandanteCompaniaState extends State<ComandanteCompania> {
         pw.Text("Tarea"),
       ])
     ];
-    for (var i = 0; i < listaTotal.length; i++) {
+    print(listaFor.length);
+    for (var i = 0; i < listaFor.length; i++) {
       childs.add(pw.TableRow(children: [
-        pw.Text((i + 1).toString()),
-        pw.Text(listaTotal[i]["rango"].toString() ?? ""),
-        pw.Text(listaTotal[i]["nombres"].toString() + " " + listaTotal[i]["apellidos"].toString()),
-        pw.Text(listaTotal[i]["estado"].toString() ?? ""),
-        pw.Text(listaTotal[i]["nota"].toString() ?? ""),
-        pw.Text(listaTotal[i]["desde"].toString() ?? ""),
-        pw.Text(listaTotal[i]["hasta"].toString() ?? ""),
-        pw.Text(listaTotal[i]["seleccion"].toString() ?? ""),
+        pw.Text(con.toString()),
+        pw.Text(listaFor[i]["rango"].toString()),
+        pw.Text(listaFor[i]["nombres"].toString() + " " + listaFor[i]["apellidos"].toString()),
+        pw.Text(listaFor[i]["estado"].toString()),
+        pw.Text(listaFor[i]["nota"].toString()),
+        pw.Text(listaFor[i]["desde"].toString()),
+        pw.Text(listaFor[i]["hasta"].toString()),
+        pw.Text(listaFor[i]["seleccion"].toString()),
       ]));
+      con++;
     }
+
     return childs;
   }
 
+  List<pw.Widget> _retornarFilas(byteListes, byteList) {
+    con = 1;
+    List<pw.Widget> lis = [];
+    List<List<dynamic>> listaARR = [];
+    List<dynamic> listaNueva = [];
+    int contadorLista = 0;
+    print("valor total:" + listaTotal.length.toString());
+    print("valor ind" + lista.length.toString());
+    for (var i = 0; i < listaTotal.length; i++) {
+      if (i <= 17) {
+        listaNueva.add(listaTotal[i]);
+      } else {
+        if (i == 18) {
+          listaARR.add(listaNueva);
+          listaNueva = [];
+          listaNueva.add(listaTotal[i]);
+        } else {
+          if (contadorLista <= 22) {
+            listaNueva.add(listaTotal[i]);
+            contadorLista += 1;
+          } else {
+            listaARR.add(listaNueva);
+            contadorLista = 0;
+            listaNueva = [];
+            listaNueva.add(listaTotal[i]);
+          }
+        }
+      }
+    }
+    listaARR.add(listaNueva);
+    print("LISTA: " + listaARR.length.toString());
+
+    for (var i = 0; i < listaARR.length; i++) {
+      if (i == 0) {
+        lis.add(pw.Table(border: pw.TableBorder.all(), children: getListTotal(listaARR[i])));
+      } else {
+        lis.add(pw.Wrap(children: [header(byteListes, byteList), pw.SizedBox(height: 24), pw.Table(border: pw.TableBorder.all(), children: getListTotal(listaARR[i]))]));
+      }
+    }
+    return lis;
+  }
+
+  pw.Row header(byteListes, byteList) {
+    return pw.Row(mainAxisAlignment: pw.MainAxisAlignment.spaceAround, children: [
+      pw.Container(
+        width: 100,
+        height: 100,
+        margin: pw.EdgeInsets.only(right: 12, bottom: 24),
+        child: pw.Image(
+            pw.MemoryImage(
+              byteListes,
+            ),
+            fit: pw.BoxFit.fitHeight),
+      ),
+      pw.Column(
+        children: [pw.Text("EJERCITO ECUATORIANO", style: pw.TextStyle(fontSize: 16, fontWeight: pw.FontWeight.bold)), pw.Text('BATALLÓN DE SELVA Nro. 63 "GUALAQUIZA"', style: pw.TextStyle(fontSize: 12, fontWeight: pw.FontWeight.bold)), pw.Text("SISTEMA DE GESTIÓN DE REGISTRO DE PARTES", style: pw.TextStyle(fontSize: 12, fontWeight: pw.FontWeight.bold))],
+      ),
+      pw.Container(
+        width: 100,
+        height: 100,
+        margin: pw.EdgeInsets.only(left: 12, bottom: 24),
+        child: pw.Image(
+            pw.MemoryImage(
+              byteList,
+            ),
+            fit: pw.BoxFit.fitHeight),
+      ),
+    ]);
+  }
+
   Future<bool> saveVideo() async {
+    setState(() {
+      generando = true;
+    });
     String path = rootPath!.path;
     final pdf = pw.Document();
     final ByteData bytes = await rootBundle.load('assets/img/logo.png');
@@ -239,42 +316,26 @@ class _ComandanteCompaniaState extends State<ComandanteCompania> {
     final ByteData byteses = await rootBundle.load('assets/img/escudo.png');
     final Uint8List byteListes = byteses.buffer.asUint8List();
     pdf.addPage(
-      pw.Page(build: (pw.Context context) {
-        return pw.Column(children: [
-          pw.Row(mainAxisAlignment: pw.MainAxisAlignment.spaceAround, children: [
-            pw.Container(
-              width: 100,
-              height: 100,
-              margin: pw.EdgeInsets.only(right: 12),
-              child: pw.Image(
-                  pw.MemoryImage(
-                    byteListes,
-                  ),
-                  fit: pw.BoxFit.fitHeight),
-            ),
-            pw.Column(
-              children: [pw.Text("EJERCITO ECUATORIANO", style: pw.TextStyle(fontSize: 16, fontWeight: pw.FontWeight.bold)), pw.Text('BATALLÓN DE SELVA Nro. 63 "GUALAQUIZA"', style: pw.TextStyle(fontSize: 12, fontWeight: pw.FontWeight.bold)), pw.Text("SISTEMA DE GESTIÓN DE REGISTRO DE PARTES", style: pw.TextStyle(fontSize: 12, fontWeight: pw.FontWeight.bold))],
-            ),
-            pw.Container(
-              width: 100,
-              height: 100,
-              margin: pw.EdgeInsets.only(left: 12),
-              child: pw.Image(
-                  pw.MemoryImage(
-                    byteList,
-                  ),
-                  fit: pw.BoxFit.fitHeight),
-            ),
-          ]),
-          pw.Text("Datos generales"),
-          pw.SizedBox(height: 12),
-          pw.Table(border: pw.TableBorder.all(), children: getList()),
-          pw.SizedBox(height: 12),
-          pw.Text("Lista detallada"),
-          pw.SizedBox(height: 12),
-          pw.Table(border: pw.TableBorder.all(), children: getListTotal())
-        ]);
-      }),
+      pw.MultiPage(
+          pageFormat: PdfPageFormat.a4,
+          orientation: pw.PageOrientation.landscape,
+          crossAxisAlignment: pw.CrossAxisAlignment.start,
+          build: (pw.Context context) {
+            return [
+              pw.Column(children: [
+                header(byteListes, byteList),
+                pw.Text("Datos generales"),
+                pw.SizedBox(height: 12),
+                pw.Wrap(children: [
+                  pw.Table(border: pw.TableBorder.all(), children: getList()),
+                ]),
+                pw.SizedBox(height: 12),
+                pw.Text("Lista detallada"),
+                pw.SizedBox(height: 12),
+              ]),
+              ..._retornarFilas(byteListes, byteList)
+            ];
+          }),
     );
 
     Directory? directory;
@@ -323,7 +384,9 @@ class _ComandanteCompaniaState extends State<ComandanteCompania> {
 
         final snackBar = SnackBar(content: Text('El archivo $nameFile se guardo en la carpeta principal de su dispositivo '));
         ScaffoldMessenger.of(context).showSnackBar(snackBar);
-
+        setState(() {
+          generando = false;
+        });
         //File saveFile = File(directory.path + "/$fileName");
 
         if (Platform.isIOS) {
@@ -331,7 +394,9 @@ class _ComandanteCompaniaState extends State<ComandanteCompania> {
         }
         return true;
       }
-    } catch (e) {}
+    } catch (e) {
+      print(e);
+    }
     return false;
   }
 
