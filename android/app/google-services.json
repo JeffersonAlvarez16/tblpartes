@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "887751905461",
+    "project_id": "tbl-partes",
+    "storage_bucket": "tbl-partes.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:887751905461:android:9516ab7d26240384482efc",
+        "android_client_info": {
+          "package_name": "com.jsolutions.tblpartes"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "887751905461-6unkpbqgk3iddp2d0pn1biut8nmoipko.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAb-v9pKqzffOAcqYM6yxWY0Iu_1RqiUd0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "887751905461-6unkpbqgk3iddp2d0pn1biut8nmoipko.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
