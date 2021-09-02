@@ -18,7 +18,7 @@ class SwicthA extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       body: Container(
-          decoration: BoxDecoration(gradient: LinearGradient(colors: [Colors.red, Colors.pink], begin: Alignment.bottomCenter, end: Alignment.topCenter)),
+          decoration: BoxDecoration(gradient: LinearGradient(colors: [Colors.red, Colors.red.shade900], begin: Alignment.bottomCenter, end: Alignment.topCenter)),
           child: Center(
               child: Column(
             mainAxisAlignment: MainAxisAlignment.center,

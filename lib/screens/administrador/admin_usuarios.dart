@@ -42,8 +42,13 @@ class _AdminUsuariosState extends State<AdminUsuarios> {
                 }),
           ),
           appBar: AppBar(
-            iconTheme: IconThemeData(color: Colors.black),
-            backgroundColor: Color.fromRGBO(237, 237, 237, 1),
+            brightness: Brightness.dark,
+            backgroundColor: Colors.black12,
+            elevation: 0.0,
+            toolbarHeight: 70,
+            flexibleSpace: Container(
+              decoration: BoxDecoration(borderRadius: BorderRadius.only(bottomLeft: Radius.circular(20), bottomRight: Radius.circular(20)), gradient: LinearGradient(colors: [Colors.red, Colors.red.shade900], begin: Alignment.bottomCenter, end: Alignment.topCenter)),
+            ),
             actions: <Widget>[
               Tooltip(
                 message: 'User Account',
@@ -65,10 +70,10 @@ class _AdminUsuariosState extends State<AdminUsuarios> {
             ],
             title: Text(
               "Gestión de usuarios",
-              style: TextStyle(color: Colors.black, fontFamily: "Lato", fontWeight: FontWeight.bold),
+              style: TextStyle(color: Colors.white, fontFamily: "Lato", fontWeight: FontWeight.bold),
             ),
           ),
-          body: UsuarioslListas(),
+          body: Container(width: MediaQuery.of(context).size.width, height: MediaQuery.of(context).size.height, color: Colors.black12, child: UsuarioslListas()),
         ));
   }
 }

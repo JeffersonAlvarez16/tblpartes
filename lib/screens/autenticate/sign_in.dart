@@ -33,7 +33,7 @@ class _SignInState extends State<SignIn> {
     return Scaffold(
       backgroundColor: Color.fromRGBO(23, 23, 23, 1),
       body: Container(
-        decoration: BoxDecoration(borderRadius: BorderRadius.only(bottomLeft: Radius.circular(20), bottomRight: Radius.circular(20)), gradient: LinearGradient(colors: [Colors.black87, Colors.white54], begin: Alignment.bottomCenter, end: Alignment.topCenter)),
+        decoration: BoxDecoration(borderRadius: BorderRadius.only(bottomLeft: Radius.circular(20), bottomRight: Radius.circular(20)), gradient: LinearGradient(colors: [Colors.black45, Colors.white12], begin: Alignment.bottomCenter, end: Alignment.topCenter)),
         child: SingleChildScrollView(
           child: Container(
             alignment: Alignment.center,
@@ -142,7 +142,7 @@ class _SignInState extends State<SignIn> {
                                               topLeft: Radius.circular(20),
                                               bottomRight: Radius.circular(20),
                                             ),
-                                            gradient: LinearGradient(colors: [Colors.red, Colors.pink], begin: Alignment.bottomCenter, end: Alignment.topCenter)),
+                                            gradient: LinearGradient(colors: [Colors.red, Colors.red.shade900], begin: Alignment.bottomCenter, end: Alignment.topCenter)),
                                         width: Medidas.width(100),
                                         child: TextButton(
                                           child: Text(

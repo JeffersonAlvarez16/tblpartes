@@ -33,39 +33,48 @@ class _NewEditCompaniaState extends State<NewEditCompania> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      floatingActionButton: update == false ? ButonGuardar(_formKey, databaseService, context, this.nombre) : ButonUpdate(_formKey, databaseService, context, nombre, widget.compania.uid),
-      appBar: AppBar(
-        iconTheme: IconThemeData(color: Colors.black),
-        backgroundColor: Color.fromRGBO(237, 237, 237, 1),
-        title: Text(
-          "Datos de la compañia",
-          style: TextStyle(color: Colors.black, fontFamily: "Lato", fontWeight: FontWeight.bold),
-        ),
-      ),
-      body: SingleChildScrollView(
-          child: Form(
-        key: _formKey,
-        autovalidateMode: AutovalidateMode.onUserInteraction,
-        child: Container(
-          padding: EdgeInsets.all(12),
-          child: Column(
-            children: [
-              textField(
-                  hintText: 'Nombre',
-                  icono: Icons.lock_open_outlined,
-                  obscureText: false,
-                  valor: nombre,
-                  validator: (value) => value.isEmpty ? "Ingrese el nombre del batallón" : null,
-                  onChanged: (value) {
-                    setState(() {
-                      nombre = value;
-                    });
-                  }),
-            ],
+        floatingActionButton: update == false ? ButonGuardar(_formKey, databaseService, context, this.nombre) : ButonUpdate(_formKey, databaseService, context, nombre, widget.compania.uid),
+        appBar: AppBar(
+          brightness: Brightness.dark,
+          backgroundColor: Colors.black12,
+          elevation: 0.0,
+          toolbarHeight: 70,
+          flexibleSpace: Container(
+            decoration: BoxDecoration(borderRadius: BorderRadius.only(bottomLeft: Radius.circular(20), bottomRight: Radius.circular(20)), gradient: LinearGradient(colors: [Colors.red, Colors.red.shade900], begin: Alignment.bottomCenter, end: Alignment.topCenter)),
+          ),
+          title: Text(
+            "Datos de la compañia",
+            style: TextStyle(color: Colors.white, fontFamily: "Lato", fontWeight: FontWeight.bold),
           ),
         ),
-      )),
-    );
+        body: Container(
+          width: MediaQuery.of(context).size.width,
+          height: MediaQuery.of(context).size.height,
+          color: Colors.black12,
+          child: SingleChildScrollView(
+              child: Form(
+            key: _formKey,
+            autovalidateMode: AutovalidateMode.onUserInteraction,
+            child: Container(
+              padding: EdgeInsets.all(12),
+              child: Column(
+                children: [
+                  textField(
+                      hintText: 'Nombre',
+                      icono: Icons.lock_open_outlined,
+                      obscureText: false,
+                      valor: nombre,
+                      validator: (value) => value.isEmpty ? "Ingrese el nombre del batallón" : null,
+                      onChanged: (value) {
+                        setState(() {
+                          nombre = value;
+                        });
+                      }),
+                ],
+              ),
+            ),
+          )),
+        ));
   }
 }
 

@@ -144,6 +144,7 @@ class _SubComandanteState extends State<SubComandante> {
         pw.Text("Nota"),
         pw.Text("Fecha inicio"),
         pw.Text("Fecha fin"),
+        pw.Text("Hora"),
         pw.Text("Tarea"),
       ])
     ];
@@ -157,6 +158,7 @@ class _SubComandanteState extends State<SubComandante> {
         pw.Text(listaFor[i]["nota"].toString()),
         pw.Text(listaFor[i]["desde"].toString()),
         pw.Text(listaFor[i]["hasta"].toString()),
+        pw.Text(listaFor[i]["hora_registro"].toString()),
         pw.Text(listaFor[i]["seleccion"].toString()),
       ]));
       con++;
@@ -986,8 +988,13 @@ class _SubComandanteState extends State<SubComandante> {
         onTap: _onItemTapped,
       ),
       appBar: AppBar(
-        toolbarHeight: 60,
-        elevation: 4,
+        brightness: Brightness.dark,
+        backgroundColor: Colors.black12,
+        elevation: 0.0,
+        toolbarHeight: 70,
+        flexibleSpace: Container(
+          decoration: BoxDecoration(borderRadius: BorderRadius.only(bottomLeft: Radius.circular(20), bottomRight: Radius.circular(20)), gradient: LinearGradient(colors: [Colors.red, Colors.redAccent], begin: Alignment.bottomCenter, end: Alignment.topCenter)),
+        ),
         title: Container(
           margin: EdgeInsets.only(left: 0),
           child: Column(
@@ -996,7 +1003,7 @@ class _SubComandanteState extends State<SubComandante> {
             children: [
               Text(
                 'Sub comandante',
-                style: TextStyle(fontFamily: "Lato", fontWeight: FontWeight.bold, color: Colors.black),
+                style: TextStyle(fontFamily: "Lato", fontWeight: FontWeight.bold, color: Colors.white),
               ),
             ],
           ),
@@ -1009,12 +1016,11 @@ class _SubComandanteState extends State<SubComandante> {
             height: 100.0,
           ),
         ),
-        backgroundColor: Color.fromRGBO(237, 237, 237, 1),
         actions: <Widget>[
           TextButton.icon(
             icon: Icon(
               Icons.logout_outlined,
-              color: Colors.black,
+              color: Colors.white,
             ),
             label: Text(""),
             onPressed: () async {
@@ -1025,7 +1031,7 @@ class _SubComandanteState extends State<SubComandante> {
         ],
       ),
       body: Center(
-        child: _widgetOptions.elementAt(_selectedIndex),
+        child: Container(width: MediaQuery.of(context).size.width, height: MediaQuery.of(context).size.height, color: Colors.black12, child: _widgetOptions.elementAt(_selectedIndex)),
       ),
     );
   }

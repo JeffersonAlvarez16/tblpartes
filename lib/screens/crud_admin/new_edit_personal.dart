@@ -71,244 +71,253 @@ class _NewEditPersonalState extends State<NewEditPersonal> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      floatingActionButton: update == false ? ButonGuardar(_formKey, databaseService, context, this.grado, this.apellidos, this.nombres, this.batallon, this.compania, this.email, this.cedula, this.password) : ButonUpdate(_formKey, databaseService, context, this.grado, this.apellidos, this.nombres, this.batallon, this.compania, this.email, widget.userModel.uid, this.cedula),
-      appBar: AppBar(
-        iconTheme: IconThemeData(color: Colors.black),
-        backgroundColor: Color.fromRGBO(237, 237, 237, 1),
-        title: Text(
-          "Datos del personal",
-          style: TextStyle(color: Colors.black, fontFamily: "Lato", fontWeight: FontWeight.bold),
-        ),
-      ),
-      body: SingleChildScrollView(
-          child: Form(
-        key: _formKey,
-        autovalidateMode: AutovalidateMode.onUserInteraction,
-        child: Container(
-          padding: EdgeInsets.all(12),
-          child: Column(
-            children: [
-              Container(
-                alignment: Alignment.center,
-                color: Colors.black12,
-                padding: EdgeInsets.all(8),
-                margin: EdgeInsets.all(0),
-                child: DropdownButton(
-                  isExpanded: true,
-                  value: grado,
-                  iconSize: 24,
-                  elevation: 16,
-                  style: const TextStyle(
-                    color: Colors.black,
-                    fontWeight: FontWeight.bold,
-                    fontFamily: "Lato",
-                  ),
-                  underline: Container(
-                    width: Medidas.width(100),
-                    height: 1,
-                    color: Color.fromRGBO(23, 23, 23, 1),
-                  ),
-                  onChanged: (dynamic? newValue) {
-                    this.setState(() {
-                      this.grado = newValue!;
-                    });
-                  },
-                  items: perfilesUsuarios.map<DropdownMenuItem>((String value) {
-                    return DropdownMenuItem(
-                      value: value,
-                      child: Text(value),
-                    );
-                  }).toList(),
-                ),
-              ),
-              SizedBox(
-                height: 8,
-              ),
-              textField(
-                  hintText: 'Apellidos',
-                  icono: Icons.lock_open_outlined,
-                  obscureText: false,
-                  valor: apellidos,
-                  validator: (value) => value.isEmpty ? "Ingrese los apellidos del personal" : null,
-                  onChanged: (value) {
-                    setState(() {
-                      apellidos = value;
-                    });
-                  }),
-              SizedBox(
-                height: 8,
-              ),
-              textField(
-                  hintText: 'Nombres',
-                  icono: Icons.lock_open_outlined,
-                  obscureText: false,
-                  valor: nombres,
-                  validator: (value) => value.isEmpty ? "Ingrese los nombres del personal" : null,
-                  onChanged: (value) {
-                    setState(() {
-                      nombres = value;
-                    });
-                  }),
-              SizedBox(
-                height: 8,
-              ),
-              textField(
-                  hintText: 'Cedula',
-                  icono: Icons.lock_open_outlined,
-                  obscureText: false,
-                  valor: cedula,
-                  validator: (value) => value.isEmpty ? "Ingrese la cedula" : null,
-                  onChanged: (value) {
-                    setState(() {
-                      cedula = value;
-                    });
-                  }),
-              SizedBox(
-                height: 8,
-              ),
-              StreamBuilder(
-                  stream: FirebaseFirestore.instance.collection("batallones").snapshots(),
-                  builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
-                    if (!snapshot.hasData) {
-                      return Center(
-                        child: CircularProgressIndicator(),
-                      );
-                    }
-                    List lista = snapshot.data!.docs;
-
-                    if (lista.length > 0) {
-                      return Container(
-                          alignment: Alignment.center,
-                          color: Colors.black12,
-                          padding: EdgeInsets.all(8),
-                          margin: EdgeInsets.all(0),
-                          child: DropdownButton(
-                            isExpanded: true,
-                            value: batallon,
-                            iconSize: 24,
-                            elevation: 16,
-                            style: const TextStyle(
-                              color: Colors.black,
-                              fontWeight: FontWeight.bold,
-                              fontFamily: "Lato",
-                            ),
-                            underline: Container(
-                              width: Medidas.width(100),
-                              height: 1,
-                              color: Color.fromRGBO(23, 23, 23, 1),
-                            ),
-                            onChanged: (dynamic? newValue) {
-                              setState(() {
-                                this.batallon = newValue!;
-                              });
-                            },
-                            items: snapshot.data!.docs.map<DropdownMenuItem>((dynamic value) {
-                              return DropdownMenuItem(
-                                value: value["nombre"],
-                                child: Text(value["nombre"]),
-                              );
-                            }).toList(),
-                          ));
-                    } else {
-                      setState(() {
-                        this.batallon = "";
-                      });
-                      return Text("dsa");
-                    }
-                  }),
-              SizedBox(
-                height: 8,
-              ),
-              StreamBuilder(
-                  stream: FirebaseFirestore.instance.collection("companias").snapshots(),
-                  builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
-                    if (!snapshot.hasData) {
-                      return Center(
-                        child: CircularProgressIndicator(),
-                      );
-                    }
-                    List lista = snapshot.data!.docs;
-                    if (lista.length > 0) {
-                      return Container(
-                        alignment: Alignment.center,
-                        color: Colors.black12,
-                        padding: EdgeInsets.all(8),
-                        margin: EdgeInsets.all(0),
-                        child: DropdownButton(
-                          isExpanded: true,
-                          value: compania,
-                          iconSize: 24,
-                          elevation: 16,
-                          style: const TextStyle(
-                            color: Colors.black,
-                            fontWeight: FontWeight.bold,
-                            fontFamily: "Lato",
-                          ),
-                          underline: Container(
-                            width: Medidas.width(100),
-                            height: 1,
-                            color: Color.fromRGBO(23, 23, 23, 1),
-                          ),
-                          onChanged: (dynamic? newValue) {
-                            setState(() {
-                              this.compania = newValue!;
-                            });
-                          },
-                          items: snapshot.data!.docs.reversed.map<DropdownMenuItem>((dynamic value) {
-                            return DropdownMenuItem(
-                              value: value["nombre"],
-                              child: Text(value["nombre"]),
-                            );
-                          }).toList(),
-                        ),
-                      );
-                    } else {
-                      setState(() {
-                        this.batallon = "";
-                      });
-                      return Text("dsa");
-                    }
-                  }),
-              SizedBox(
-                height: 8,
-              ),
-              textField(
-                  hintText: 'Correo Electrónico',
-                  icono: Icons.lock_open_outlined,
-                  obscureText: false,
-                  valor: email,
-                  validator: (value) => value.isEmpty ? "Ingrese el correo del personal" : null,
-                  onChanged: (value) {
-                    setState(() {
-                      email = value;
-                    });
-                  }),
-              SizedBox(
-                height: 8,
-              ),
-              this.update == false
-                  ? textField(
-                      hintText: 'Contraseña',
-                      icono: Icons.lock_open_outlined,
-                      obscureText: false,
-                      valor: password,
-                      validator: (value) => value.isEmpty ? "Ingrese la contraseña" : null,
-                      onChanged: (value) {
-                        setState(() {
-                          password = value;
-                        });
-                      })
-                  : SizedBox(
-                      height: 1,
-                    ),
-              SizedBox(
-                height: 48,
-              ),
-            ],
+        floatingActionButton: update == false ? ButonGuardar(_formKey, databaseService, context, this.grado, this.apellidos, this.nombres, this.batallon, this.compania, this.email, this.cedula, this.password) : ButonUpdate(_formKey, databaseService, context, this.grado, this.apellidos, this.nombres, this.batallon, this.compania, this.email, widget.userModel.uid, this.cedula),
+        appBar: AppBar(
+          brightness: Brightness.dark,
+          backgroundColor: Colors.black12,
+          elevation: 0.0,
+          toolbarHeight: 70,
+          flexibleSpace: Container(
+            decoration: BoxDecoration(borderRadius: BorderRadius.only(bottomLeft: Radius.circular(20), bottomRight: Radius.circular(20)), gradient: LinearGradient(colors: [Colors.red, Colors.red.shade900], begin: Alignment.bottomCenter, end: Alignment.topCenter)),
+          ),
+          title: Text(
+            "Datos del personal",
+            style: TextStyle(color: Colors.white, fontFamily: "Lato", fontWeight: FontWeight.bold),
           ),
         ),
-      )),
-    );
+        body: Container(
+          width: MediaQuery.of(context).size.width,
+          height: MediaQuery.of(context).size.height,
+          color: Colors.black12,
+          child: SingleChildScrollView(
+              child: Form(
+            key: _formKey,
+            autovalidateMode: AutovalidateMode.onUserInteraction,
+            child: Container(
+              padding: EdgeInsets.all(12),
+              child: Column(
+                children: [
+                  Container(
+                    alignment: Alignment.center,
+                    color: Colors.black12,
+                    padding: EdgeInsets.all(8),
+                    margin: EdgeInsets.all(0),
+                    child: DropdownButton(
+                      isExpanded: true,
+                      value: grado,
+                      iconSize: 24,
+                      elevation: 16,
+                      style: const TextStyle(
+                        color: Colors.black,
+                        fontWeight: FontWeight.bold,
+                        fontFamily: "Lato",
+                      ),
+                      underline: Container(
+                        width: Medidas.width(100),
+                        height: 1,
+                        color: Color.fromRGBO(23, 23, 23, 1),
+                      ),
+                      onChanged: (dynamic? newValue) {
+                        this.setState(() {
+                          this.grado = newValue!;
+                        });
+                      },
+                      items: perfilesUsuarios.map<DropdownMenuItem>((String value) {
+                        return DropdownMenuItem(
+                          value: value,
+                          child: Text(value),
+                        );
+                      }).toList(),
+                    ),
+                  ),
+                  SizedBox(
+                    height: 8,
+                  ),
+                  textField(
+                      hintText: 'Apellidos',
+                      icono: Icons.lock_open_outlined,
+                      obscureText: false,
+                      valor: apellidos,
+                      validator: (value) => value.isEmpty ? "Ingrese los apellidos del personal" : null,
+                      onChanged: (value) {
+                        setState(() {
+                          apellidos = value;
+                        });
+                      }),
+                  SizedBox(
+                    height: 8,
+                  ),
+                  textField(
+                      hintText: 'Nombres',
+                      icono: Icons.lock_open_outlined,
+                      obscureText: false,
+                      valor: nombres,
+                      validator: (value) => value.isEmpty ? "Ingrese los nombres del personal" : null,
+                      onChanged: (value) {
+                        setState(() {
+                          nombres = value;
+                        });
+                      }),
+                  SizedBox(
+                    height: 8,
+                  ),
+                  textField(
+                      hintText: 'Cedula',
+                      icono: Icons.lock_open_outlined,
+                      obscureText: false,
+                      valor: cedula,
+                      validator: (value) => value.isEmpty ? "Ingrese la cedula" : null,
+                      onChanged: (value) {
+                        setState(() {
+                          cedula = value;
+                        });
+                      }),
+                  SizedBox(
+                    height: 8,
+                  ),
+                  StreamBuilder(
+                      stream: FirebaseFirestore.instance.collection("batallones").snapshots(),
+                      builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
+                        if (!snapshot.hasData) {
+                          return Center(
+                            child: CircularProgressIndicator(),
+                          );
+                        }
+                        List lista = snapshot.data!.docs;
+
+                        if (lista.length > 0) {
+                          return Container(
+                              alignment: Alignment.center,
+                              color: Colors.black12,
+                              padding: EdgeInsets.all(8),
+                              margin: EdgeInsets.all(0),
+                              child: DropdownButton(
+                                isExpanded: true,
+                                value: batallon,
+                                iconSize: 24,
+                                elevation: 16,
+                                style: const TextStyle(
+                                  color: Colors.black,
+                                  fontWeight: FontWeight.bold,
+                                  fontFamily: "Lato",
+                                ),
+                                underline: Container(
+                                  width: Medidas.width(100),
+                                  height: 1,
+                                  color: Color.fromRGBO(23, 23, 23, 1),
+                                ),
+                                onChanged: (dynamic? newValue) {
+                                  setState(() {
+                                    this.batallon = newValue!;
+                                  });
+                                },
+                                items: snapshot.data!.docs.map<DropdownMenuItem>((dynamic value) {
+                                  return DropdownMenuItem(
+                                    value: value["nombre"],
+                                    child: Text(value["nombre"]),
+                                  );
+                                }).toList(),
+                              ));
+                        } else {
+                          setState(() {
+                            this.batallon = "";
+                          });
+                          return Text("dsa");
+                        }
+                      }),
+                  SizedBox(
+                    height: 8,
+                  ),
+                  StreamBuilder(
+                      stream: FirebaseFirestore.instance.collection("companias").snapshots(),
+                      builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
+                        if (!snapshot.hasData) {
+                          return Center(
+                            child: CircularProgressIndicator(),
+                          );
+                        }
+                        List lista = snapshot.data!.docs;
+                        if (lista.length > 0) {
+                          return Container(
+                            alignment: Alignment.center,
+                            color: Colors.black12,
+                            padding: EdgeInsets.all(8),
+                            margin: EdgeInsets.all(0),
+                            child: DropdownButton(
+                              isExpanded: true,
+                              value: compania,
+                              iconSize: 24,
+                              elevation: 16,
+                              style: const TextStyle(
+                                color: Colors.black,
+                                fontWeight: FontWeight.bold,
+                                fontFamily: "Lato",
+                              ),
+                              underline: Container(
+                                width: Medidas.width(100),
+                                height: 1,
+                                color: Color.fromRGBO(23, 23, 23, 1),
+                              ),
+                              onChanged: (dynamic? newValue) {
+                                setState(() {
+                                  this.compania = newValue!;
+                                });
+                              },
+                              items: snapshot.data!.docs.reversed.map<DropdownMenuItem>((dynamic value) {
+                                return DropdownMenuItem(
+                                  value: value["nombre"],
+                                  child: Text(value["nombre"]),
+                                );
+                              }).toList(),
+                            ),
+                          );
+                        } else {
+                          setState(() {
+                            this.batallon = "";
+                          });
+                          return Text("dsa");
+                        }
+                      }),
+                  SizedBox(
+                    height: 8,
+                  ),
+                  textField(
+                      hintText: 'Correo Electrónico',
+                      icono: Icons.lock_open_outlined,
+                      obscureText: false,
+                      valor: email,
+                      validator: (value) => value.isEmpty ? "Ingrese el correo del personal" : null,
+                      onChanged: (value) {
+                        setState(() {
+                          email = value;
+                        });
+                      }),
+                  SizedBox(
+                    height: 8,
+                  ),
+                  this.update == false
+                      ? textField(
+                          hintText: 'Contraseña',
+                          icono: Icons.lock_open_outlined,
+                          obscureText: false,
+                          valor: password,
+                          validator: (value) => value.isEmpty ? "Ingrese la contraseña" : null,
+                          onChanged: (value) {
+                            setState(() {
+                              password = value;
+                            });
+                          })
+                      : SizedBox(
+                          height: 1,
+                        ),
+                  SizedBox(
+                    height: 48,
+                  ),
+                ],
+              ),
+            ),
+          )),
+        ));
   }
 }
 

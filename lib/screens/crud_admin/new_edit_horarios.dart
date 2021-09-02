@@ -79,61 +79,70 @@ class _NewEditHorariosState extends State<NewEditHorarios> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      floatingActionButton: update == false
-          ? ButonGuardar(_formKey, databaseService, context, this.hora, this.estado)
-          : ButonUpdate(
-              _formKey,
-              databaseService,
-              context,
-              hora,
-              widget.horario.uid,
-            ),
-      appBar: AppBar(
-        iconTheme: IconThemeData(color: Colors.black),
-        backgroundColor: Color.fromRGBO(237, 237, 237, 1),
-        title: Text(
-          "Datos de los horarios",
-          style: TextStyle(color: Colors.black, fontFamily: "Lato", fontWeight: FontWeight.bold),
-        ),
-      ),
-      body: SingleChildScrollView(
-          child: Form(
-        key: _formKey,
-        autovalidateMode: AutovalidateMode.onUserInteraction,
-        child: Container(
-          padding: EdgeInsets.all(12),
-          child: Column(
-            children: [
-              InkWell(
-                onTap: () {
-                  selectTime(context);
-                },
-                child: Container(
-                  margin: EdgeInsets.only(top: 30),
-                  alignment: Alignment.center,
-                  decoration: BoxDecoration(color: Colors.black12),
-                  child: TextFormField(
-                    validator: (value) => value!.isEmpty || value == null ? "Ingrese un horario" : null,
-                    style: TextStyle(color: Colors.black, fontSize: 40, fontWeight: FontWeight.bold, fontFamily: "Lato", fontStyle: FontStyle.normal),
-                    textAlign: TextAlign.center,
-                    enabled: false,
-                    keyboardType: TextInputType.text,
-                    controller: _timeController,
-                    decoration: InputDecoration(
-                        labelText: "Seleccionar el horario",
-                        hintStyle: TextStyle(fontWeight: FontWeight.w400, color: Colors.black, fontFamily: "Lato"),
-                        labelStyle: TextStyle(fontWeight: FontWeight.w600, color: Colors.black, fontSize: 14, fontFamily: "Lato"),
-                        disabledBorder: UnderlineInputBorder(borderSide: BorderSide.none),
-                        // labelText: 'Time',
-                        contentPadding: EdgeInsets.all(5)),
-                  ),
-                ),
+        floatingActionButton: update == false
+            ? ButonGuardar(_formKey, databaseService, context, this.hora, this.estado)
+            : ButonUpdate(
+                _formKey,
+                databaseService,
+                context,
+                hora,
+                widget.horario.uid,
               ),
-            ],
+        appBar: AppBar(
+          brightness: Brightness.dark,
+          backgroundColor: Colors.black12,
+          elevation: 0.0,
+          toolbarHeight: 70,
+          flexibleSpace: Container(
+            decoration: BoxDecoration(borderRadius: BorderRadius.only(bottomLeft: Radius.circular(20), bottomRight: Radius.circular(20)), gradient: LinearGradient(colors: [Colors.red, Colors.red.shade900], begin: Alignment.bottomCenter, end: Alignment.topCenter)),
+          ),
+          title: Text(
+            "Datos de los horarios",
+            style: TextStyle(color: Colors.white, fontFamily: "Lato", fontWeight: FontWeight.bold),
           ),
         ),
-      )),
-    );
+        body: Container(
+          width: MediaQuery.of(context).size.width,
+          height: MediaQuery.of(context).size.height,
+          color: Colors.black12,
+          child: SingleChildScrollView(
+              child: Form(
+            key: _formKey,
+            autovalidateMode: AutovalidateMode.onUserInteraction,
+            child: Container(
+              padding: EdgeInsets.all(12),
+              child: Column(
+                children: [
+                  InkWell(
+                    onTap: () {
+                      selectTime(context);
+                    },
+                    child: Container(
+                      margin: EdgeInsets.only(top: 30),
+                      alignment: Alignment.center,
+                      decoration: BoxDecoration(color: Colors.black12),
+                      child: TextFormField(
+                        validator: (value) => value!.isEmpty || value == null ? "Ingrese un horario" : null,
+                        style: TextStyle(color: Colors.black, fontSize: 40, fontWeight: FontWeight.bold, fontFamily: "Lato", fontStyle: FontStyle.normal),
+                        textAlign: TextAlign.center,
+                        enabled: false,
+                        keyboardType: TextInputType.text,
+                        controller: _timeController,
+                        decoration: InputDecoration(
+                            labelText: "Seleccionar el horario",
+                            hintStyle: TextStyle(fontWeight: FontWeight.w400, color: Colors.black, fontFamily: "Lato"),
+                            labelStyle: TextStyle(fontWeight: FontWeight.w600, color: Colors.black, fontSize: 14, fontFamily: "Lato"),
+                            disabledBorder: UnderlineInputBorder(borderSide: BorderSide.none),
+                            // labelText: 'Time',
+                            contentPadding: EdgeInsets.all(5)),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          )),
+        ));
   }
 }
 

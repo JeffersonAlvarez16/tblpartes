@@ -129,6 +129,7 @@ class _ClaseSemanaState extends State<ClaseSemana> {
         pw.Text("Nota"),
         pw.Text("Fecha inicio"),
         pw.Text("Fecha fin"),
+        pw.Text("Hora"),
         pw.Text("Tarea"),
       ])
     ];
@@ -142,6 +143,7 @@ class _ClaseSemanaState extends State<ClaseSemana> {
         pw.Text(listaFor[i]["nota"].toString()),
         pw.Text(listaFor[i]["desde"].toString()),
         pw.Text(listaFor[i]["hasta"].toString()),
+        pw.Text(listaFor[i]["hora_registro"].toString()),
         pw.Text(listaFor[i]["seleccion"].toString()),
       ]));
       con++;
@@ -342,13 +344,23 @@ class _ClaseSemanaState extends State<ClaseSemana> {
         stream: FirebaseFirestore.instance.collection("horarios").where("estado", isEqualTo: true).snapshots(),
         builder: (context, AsyncSnapshot<QuerySnapshot<Map<String, dynamic>>> snapshot) {
           if (!snapshot.hasData) {
-            return CircularProgressIndicator();
+            return Scaffold(
+                body: Center(
+              child: Column(
+                children: [Text("Cargando dato"), CircularProgressIndicator()],
+              ),
+            ));
           }
           if (snapshot.hasData && snapshot.connectionState == ConnectionState.active) {
             Map<String, dynamic> data = snapshot.data!.docs[0].data();
             return Home(context, widget.arguments["compania"], data["hora"]);
           }
-          return CircularProgressIndicator();
+          return Scaffold(
+              body: Center(
+            child: Column(
+              children: [Text("Cargando dato"), CircularProgressIndicator()],
+            ),
+          ));
         },
       ),
       SingleChildScrollView(
@@ -738,6 +750,7 @@ class _ClaseSemanaState extends State<ClaseSemana> {
 
     return Scaffold(
       bottomNavigationBar: BottomNavigationBar(
+        backgroundColor: Colors.white54,
         type: BottomNavigationBarType.fixed,
         items: <BottomNavigationBarItem>[
           BottomNavigationBarItem(
@@ -754,8 +767,13 @@ class _ClaseSemanaState extends State<ClaseSemana> {
         onTap: _onItemTapped,
       ),
       appBar: AppBar(
-        toolbarHeight: 60,
-        elevation: 4,
+        brightness: Brightness.dark,
+        backgroundColor: Colors.black12,
+        elevation: 0.0,
+        toolbarHeight: 70,
+        flexibleSpace: Container(
+          decoration: BoxDecoration(borderRadius: BorderRadius.only(bottomLeft: Radius.circular(20), bottomRight: Radius.circular(20)), gradient: LinearGradient(colors: [Colors.red, Colors.red.shade900], begin: Alignment.bottomCenter, end: Alignment.topCenter)),
+        ),
         title: Container(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.start,
@@ -763,9 +781,9 @@ class _ClaseSemanaState extends State<ClaseSemana> {
             children: [
               Text(
                 'Clase de semana',
-                style: TextStyle(fontFamily: "Lato", fontWeight: FontWeight.bold, color: Colors.black),
+                style: TextStyle(fontFamily: "Lato", fontWeight: FontWeight.bold, color: Colors.white),
               ),
-              label(widget.arguments["compania"], Colors.black, 10)
+              label(widget.arguments["compania"], Colors.white, 10)
             ],
           ),
         ),
@@ -777,12 +795,11 @@ class _ClaseSemanaState extends State<ClaseSemana> {
             height: 100.0,
           ),
         ),
-        backgroundColor: Color.fromRGBO(237, 237, 237, 1),
         actions: <Widget>[
           TextButton.icon(
             icon: Icon(
               Icons.logout_outlined,
-              color: Colors.black,
+              color: Colors.white,
             ),
             label: label("", Color.fromRGBO(218, 0, 55, 1), 10),
             onPressed: () async {
@@ -793,7 +810,7 @@ class _ClaseSemanaState extends State<ClaseSemana> {
         ],
       ),
       body: Center(
-        child: _widgetOptions.elementAt(_selectedIndex),
+        child: Container(width: MediaQuery.of(context).size.width, height: MediaQuery.of(context).size.height, color: Colors.black12, child: _widgetOptions.elementAt(_selectedIndex)),
       ),
     );
   }
@@ -816,7 +833,14 @@ Widget Home(context, compania, hora) {
         stream: FirebaseFirestore.instance.collection("partes").where("compania", isEqualTo: compania).where("fechaRegistro", isEqualTo: desdeString).where("hora_registro", isEqualTo: hora).snapshots(),
         builder: (context, AsyncSnapshot<QuerySnapshot<Map<String, dynamic>>> snapshot) {
           if (!snapshot.hasData) {
-            return CircularProgressIndicator();
+            return Scaffold(
+                body: Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [Text("Cargando dato"), CircularProgressIndicator()],
+              ),
+            ));
           }
           if (snapshot.connectionState == ConnectionState.active) {
             List<dynamic> list = snapshot.data!.docs.map((DocumentSnapshot doc) {
@@ -884,7 +908,14 @@ Widget Home(context, compania, hora) {
         stream: FirebaseFirestore.instance.collection("partes").where("compania", isEqualTo: compania).where("fechaRegistro", isEqualTo: desdeString).where("hora_registro", isEqualTo: hora).snapshots(),
         builder: (context, AsyncSnapshot<QuerySnapshot<Map<String, dynamic>>> snapshot) {
           if (!snapshot.hasData) {
-            return CircularProgressIndicator();
+            return Scaffold(
+                body: Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [Text("Cargando dato"), CircularProgressIndicator()],
+              ),
+            ));
           }
           if (snapshot.connectionState == ConnectionState.active) {
             List<dynamic> list = snapshot.data!.docs.map((DocumentSnapshot doc) {

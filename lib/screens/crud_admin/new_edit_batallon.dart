@@ -39,7 +39,7 @@ class _NewEditBatallonState extends State<NewEditBatallon> {
         elevation: 0.0,
         toolbarHeight: 70,
         flexibleSpace: Container(
-          decoration: BoxDecoration(borderRadius: BorderRadius.only(bottomLeft: Radius.circular(20), bottomRight: Radius.circular(20)), gradient: LinearGradient(colors: [Colors.red, Colors.pink], begin: Alignment.bottomCenter, end: Alignment.topCenter)),
+          decoration: BoxDecoration(borderRadius: BorderRadius.only(bottomLeft: Radius.circular(20), bottomRight: Radius.circular(20)), gradient: LinearGradient(colors: [Colors.red, Colors.red.shade900], begin: Alignment.bottomCenter, end: Alignment.topCenter)),
         ),
         title: Text(
           "Datos del Batallón",

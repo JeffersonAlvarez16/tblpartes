@@ -55,188 +55,197 @@ class _NewEditEstadosState extends State<NewEditEstados> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      floatingActionButton: update == false ? ButonGuardar(_formKey, databaseService, context, this.nombre, this.nota, this.fechas, this.listas, this.listado) : ButonUpdate(_formKey, databaseService, context, nombre, widget.estados.uid, nota, fechas, listas, listado),
-      appBar: AppBar(
-        iconTheme: IconThemeData(color: Colors.black),
-        backgroundColor: Color.fromRGBO(237, 237, 237, 1),
-        title: Text(
-          "Datos del estado",
-          style: TextStyle(color: Colors.black, fontFamily: "Lato", fontWeight: FontWeight.bold),
+        floatingActionButton: update == false ? ButonGuardar(_formKey, databaseService, context, this.nombre, this.nota, this.fechas, this.listas, this.listado) : ButonUpdate(_formKey, databaseService, context, nombre, widget.estados.uid, nota, fechas, listas, listado),
+        appBar: AppBar(
+          brightness: Brightness.dark,
+          backgroundColor: Colors.black12,
+          elevation: 0.0,
+          toolbarHeight: 70,
+          flexibleSpace: Container(
+            decoration: BoxDecoration(borderRadius: BorderRadius.only(bottomLeft: Radius.circular(20), bottomRight: Radius.circular(20)), gradient: LinearGradient(colors: [Colors.red, Colors.red.shade900], begin: Alignment.bottomCenter, end: Alignment.topCenter)),
+          ),
+          title: Text(
+            "Datos del estado",
+            style: TextStyle(color: Colors.white, fontFamily: "Lato", fontWeight: FontWeight.bold),
+          ),
         ),
-      ),
-      body: SingleChildScrollView(
-          padding: EdgeInsets.only(bottom: 36),
-          child: Form(
-            key: _formKey,
-            autovalidateMode: AutovalidateMode.onUserInteraction,
-            child: Container(
-              padding: EdgeInsets.all(12),
-              child: Column(
-                children: [
-                  textField(
-                      hintText: 'Nombre',
-                      icono: Icons.lock_open_outlined,
-                      obscureText: false,
-                      valor: nombre,
-                      validator: (value) => value.isEmpty ? "Ingrese el nombre del batallón" : null,
-                      onChanged: (value) {
-                        setState(() {
-                          nombre = value;
-                        });
-                      }),
-                  Column(
+        body: Container(
+          width: MediaQuery.of(context).size.width,
+          height: MediaQuery.of(context).size.height,
+          color: Colors.black12,
+          child: SingleChildScrollView(
+              padding: EdgeInsets.only(bottom: 36),
+              child: Form(
+                key: _formKey,
+                autovalidateMode: AutovalidateMode.onUserInteraction,
+                child: Container(
+                  padding: EdgeInsets.all(12),
+                  child: Column(
                     children: [
-                      Row(
+                      textField(
+                          hintText: 'Nombre',
+                          icono: Icons.lock_open_outlined,
+                          obscureText: false,
+                          valor: nombre,
+                          validator: (value) => value.isEmpty ? "Ingrese el nombre del batallón" : null,
+                          onChanged: (value) {
+                            setState(() {
+                              nombre = value;
+                            });
+                          }),
+                      Column(
                         children: [
-                          Checkbox(
-                            checkColor: Colors.white,
-                            value: nota,
-                            onChanged: (bool? value) {
-                              setState(() {
-                                nota = value!;
-                              });
-                            },
-                          ),
-                          Expanded(child: Text("Marque esta casilla, si debe dejar una nota ", style: TextStyle(color: Colors.black, fontFamily: "Lato", fontSize: 12))),
-                        ],
-                      )
-                    ],
-                  ),
-                  Column(
-                    children: [
-                      Row(
-                        children: [
-                          Checkbox(
-                            checkColor: Colors.white,
-                            value: fechas,
-                            onChanged: (bool? value) {
-                              setState(() {
-                                fechas = value!;
-                              });
-                            },
-                          ),
-                          Expanded(child: Text("Marque esta casilla, si debe una fecha de salida y regreso", style: TextStyle(color: Colors.black, fontFamily: "Lato", fontSize: 12))),
-                        ],
-                      )
-                    ],
-                  ),
-                  Column(
-                    children: [
-                      Row(
-                        children: [
-                          Checkbox(
-                            checkColor: Colors.white,
-                            value: listado,
-                            onChanged: (bool? value) {
-                              setState(() {
-                                listado = value!;
-                              });
-                              if (value == false) {
-                                setState(() {
-                                  listas.clear();
-                                });
-                              }
-                            },
-                          ),
-                          Expanded(child: Text("Marque está casilla, si debe seleccionar de un listado", style: TextStyle(color: Colors.black, fontFamily: "Lato", fontSize: 12))),
-                        ],
-                      )
-                    ],
-                  ),
-                  listado == true
-                      ? Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          children: [
-                            Row(
-                              children: [
-                                Container(
-                                  width: Medidas.width(75),
-                                  decoration: BoxDecoration(
-                                    color: Colors.black12,
-                                  ),
-                                  child: TextFormField(
-                                    controller: textController,
-                                    onChanged: (value) {
-                                      setState(() {
-                                        nombreLista = value;
-                                      });
-                                    },
-                                    style: TextStyle(color: Colors.black, fontSize: 14, fontWeight: FontWeight.bold, fontFamily: "Lato", fontStyle: FontStyle.normal),
-                                    textAlign: TextAlign.justify,
-                                    decoration: InputDecoration(
-                                      enabledBorder: UnderlineInputBorder(
-                                        borderSide: BorderSide(color: Color.fromRGBO(23, 23, 23, 1)),
-                                      ),
-                                      focusedBorder: UnderlineInputBorder(
-                                        borderSide: BorderSide(color: Color.fromRGBO(23, 23, 23, 1)),
-                                      ),
-                                      contentPadding: EdgeInsets.all(8),
-                                      hintText: "Nombre",
-                                      labelText: "Nombre",
-                                      hintStyle: TextStyle(fontWeight: FontWeight.w400, color: Colors.black, fontFamily: "Lato"),
-                                      labelStyle: TextStyle(fontWeight: FontWeight.w400, color: Colors.black, fontFamily: "Lato"),
-                                    ),
-                                  ),
-                                ),
-                                TextButton(
-                                    onPressed: () {
-                                      if (nombreLista.length > 0) {
-                                        agregarEstado(nombreLista);
-                                        setState(() {
-                                          nombreLista = "";
-                                        });
-                                        textController.clear();
-                                      } else {
-                                        final snackBar = SnackBar(content: Text('Debe ingresar un nombre para poder añadir a la lista'));
-                                        ScaffoldMessenger.of(context).showSnackBar(snackBar);
-                                      }
-                                    },
-                                    child: Text("Agregar"))
-                              ],
-                            ),
-                            SizedBox(
-                              height: 12,
-                            ),
-                            Text("Lista de opciones"),
-                          ],
-                        )
-                      : Text(""),
-                  SingleChildScrollView(
-                      physics: ScrollPhysics(),
-                      child: Column(
-                        mainAxisSize: MainAxisSize.max,
-                        children: [
-                          ListView.builder(
-                            physics: NeverScrollableScrollPhysics(),
-                            shrinkWrap: true,
-                            itemCount: listas.length,
-                            itemBuilder: (context, index) {
-                              return Container(
-                                padding: EdgeInsets.only(left: 24, right: 24, top: 8, bottom: 8),
-                                child: Row(
-                                  children: [
-                                    Expanded(child: Text(listas[index])),
-                                    TextButton.icon(
-                                        onPressed: () {
-                                          setState(() {
-                                            listas.removeWhere((element) => element == listas[index]);
-                                          });
-                                        },
-                                        icon: Icon(Icons.delete),
-                                        label: Text(""))
-                                  ],
-                                ),
-                              );
-                            },
+                          Row(
+                            children: [
+                              Checkbox(
+                                checkColor: Colors.white,
+                                value: nota,
+                                onChanged: (bool? value) {
+                                  setState(() {
+                                    nota = value!;
+                                  });
+                                },
+                              ),
+                              Expanded(child: Text("Marque esta casilla, si debe dejar una nota ", style: TextStyle(color: Colors.black, fontFamily: "Lato", fontSize: 12))),
+                            ],
                           )
                         ],
-                      ))
-                ],
-              ),
-            ),
-          )),
-    );
+                      ),
+                      Column(
+                        children: [
+                          Row(
+                            children: [
+                              Checkbox(
+                                checkColor: Colors.white,
+                                value: fechas,
+                                onChanged: (bool? value) {
+                                  setState(() {
+                                    fechas = value!;
+                                  });
+                                },
+                              ),
+                              Expanded(child: Text("Marque esta casilla, si debe una fecha de salida y regreso", style: TextStyle(color: Colors.black, fontFamily: "Lato", fontSize: 12))),
+                            ],
+                          )
+                        ],
+                      ),
+                      Column(
+                        children: [
+                          Row(
+                            children: [
+                              Checkbox(
+                                checkColor: Colors.white,
+                                value: listado,
+                                onChanged: (bool? value) {
+                                  setState(() {
+                                    listado = value!;
+                                  });
+                                  if (value == false) {
+                                    setState(() {
+                                      listas.clear();
+                                    });
+                                  }
+                                },
+                              ),
+                              Expanded(child: Text("Marque está casilla, si debe seleccionar de un listado", style: TextStyle(color: Colors.black, fontFamily: "Lato", fontSize: 12))),
+                            ],
+                          )
+                        ],
+                      ),
+                      listado == true
+                          ? Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              children: [
+                                Row(
+                                  children: [
+                                    Container(
+                                      width: Medidas.width(75),
+                                      decoration: BoxDecoration(
+                                        color: Colors.black12,
+                                      ),
+                                      child: TextFormField(
+                                        controller: textController,
+                                        onChanged: (value) {
+                                          setState(() {
+                                            nombreLista = value;
+                                          });
+                                        },
+                                        style: TextStyle(color: Colors.black, fontSize: 14, fontWeight: FontWeight.bold, fontFamily: "Lato", fontStyle: FontStyle.normal),
+                                        textAlign: TextAlign.justify,
+                                        decoration: InputDecoration(
+                                          enabledBorder: UnderlineInputBorder(
+                                            borderSide: BorderSide(color: Color.fromRGBO(23, 23, 23, 1)),
+                                          ),
+                                          focusedBorder: UnderlineInputBorder(
+                                            borderSide: BorderSide(color: Color.fromRGBO(23, 23, 23, 1)),
+                                          ),
+                                          contentPadding: EdgeInsets.all(8),
+                                          hintText: "Nombre",
+                                          labelText: "Nombre",
+                                          hintStyle: TextStyle(fontWeight: FontWeight.w400, color: Colors.black, fontFamily: "Lato"),
+                                          labelStyle: TextStyle(fontWeight: FontWeight.w400, color: Colors.black, fontFamily: "Lato"),
+                                        ),
+                                      ),
+                                    ),
+                                    TextButton(
+                                        onPressed: () {
+                                          if (nombreLista.length > 0) {
+                                            agregarEstado(nombreLista);
+                                            setState(() {
+                                              nombreLista = "";
+                                            });
+                                            textController.clear();
+                                          } else {
+                                            final snackBar = SnackBar(content: Text('Debe ingresar un nombre para poder añadir a la lista'));
+                                            ScaffoldMessenger.of(context).showSnackBar(snackBar);
+                                          }
+                                        },
+                                        child: Text("Agregar"))
+                                  ],
+                                ),
+                                SizedBox(
+                                  height: 12,
+                                ),
+                                Text("Lista de opciones"),
+                              ],
+                            )
+                          : Text(""),
+                      SingleChildScrollView(
+                          physics: ScrollPhysics(),
+                          child: Column(
+                            mainAxisSize: MainAxisSize.max,
+                            children: [
+                              ListView.builder(
+                                physics: NeverScrollableScrollPhysics(),
+                                shrinkWrap: true,
+                                itemCount: listas.length,
+                                itemBuilder: (context, index) {
+                                  return Container(
+                                    padding: EdgeInsets.only(left: 24, right: 24, top: 8, bottom: 8),
+                                    child: Row(
+                                      children: [
+                                        Expanded(child: Text(listas[index])),
+                                        TextButton.icon(
+                                            onPressed: () {
+                                              setState(() {
+                                                listas.removeWhere((element) => element == listas[index]);
+                                              });
+                                            },
+                                            icon: Icon(Icons.delete),
+                                            label: Text(""))
+                                      ],
+                                    ),
+                                  );
+                                },
+                              )
+                            ],
+                          ))
+                    ],
+                  ),
+                ),
+              )),
+        ));
   }
 }
 

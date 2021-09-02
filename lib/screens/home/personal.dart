@@ -95,7 +95,7 @@ class _PersonalState extends State<Personal> {
       }
     });
     showNotification();
-    streamServices.horariosString.listen((event) {
+    streamServices.horariosStringTrue.listen((event) {
       setState(() {
         horaParte = event.first;
       });
@@ -312,7 +312,7 @@ class _PersonalState extends State<Personal> {
           elevation: 0.0,
           toolbarHeight: 70,
           flexibleSpace: Container(
-            decoration: BoxDecoration(borderRadius: BorderRadius.only(bottomLeft: Radius.circular(20), bottomRight: Radius.circular(20)), gradient: LinearGradient(colors: [Colors.red, Colors.pink], begin: Alignment.bottomCenter, end: Alignment.topCenter)),
+            decoration: BoxDecoration(borderRadius: BorderRadius.only(bottomLeft: Radius.circular(20), bottomRight: Radius.circular(20)), gradient: LinearGradient(colors: [Colors.red, Colors.red.shade900], begin: Alignment.bottomCenter, end: Alignment.topCenter)),
           ),
           title: Text(
             'Personal',

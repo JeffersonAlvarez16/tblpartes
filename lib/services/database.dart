@@ -57,10 +57,7 @@ class DatabaseService {
   }
 
   Future<void> createParte(String uid, Map<String, dynamic> parte) async {
-    await firestore.collection("personal").doc(parte["uid_personal"]).update({
-      "desde": parte["desde"],
-      "hasta": parte["hasta"],
-    });
+    await firestore.collection("personal").doc(parte["uid_personal"]).update({"desde": parte["desde"], "hasta": parte["hasta"], "estado": parte["estado"]});
     return await firestore.collection("partes").doc(uid).set(parte);
   }
 

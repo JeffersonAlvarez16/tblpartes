@@ -144,6 +144,7 @@ class _OficialSemanaState extends State<OficialSemana> {
         pw.Text("Nota"),
         pw.Text("Fecha inicio"),
         pw.Text("Fecha fin"),
+        pw.Text("Hora"),
         pw.Text("Tarea"),
       ])
     ];
@@ -157,6 +158,7 @@ class _OficialSemanaState extends State<OficialSemana> {
         pw.Text(listaFor[i]["nota"].toString()),
         pw.Text(listaFor[i]["desde"].toString()),
         pw.Text(listaFor[i]["hasta"].toString()),
+        pw.Text(listaFor[i]["hora_registro"].toString()),
         pw.Text(listaFor[i]["seleccion"].toString()),
       ]));
       con++;

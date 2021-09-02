@@ -55,148 +55,157 @@ class _NewEditUsuariosState extends State<NewEditUsuarios> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      floatingActionButton: update == false ? ButonGuardar(_formKey, databaseService, context, this.nombres, this.uid_user, this.type_user, compania) : ButonUpdate(_formKey, databaseService, context, nombres, widget.usuario.uid, uid_user, type_user, compania),
-      appBar: AppBar(
-        iconTheme: IconThemeData(color: Colors.black),
-        backgroundColor: Color.fromRGBO(237, 237, 237, 1),
-        title: Text(
-          "Datos del usuario",
-          style: TextStyle(color: Colors.black, fontFamily: "Lato", fontWeight: FontWeight.bold),
-        ),
-      ),
-      body: SingleChildScrollView(
-          child: Form(
-        key: _formKey,
-        autovalidateMode: AutovalidateMode.onUserInteraction,
-        child: Container(
-          padding: EdgeInsets.all(12),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                "Seleccione el tipo de usuario",
-                textAlign: TextAlign.start,
-                style: TextStyle(fontWeight: FontWeight.w600),
-              ),
-              Container(
-                alignment: Alignment.center,
-                color: Colors.black12,
-                padding: EdgeInsets.all(8),
-                margin: EdgeInsets.all(0),
-                child: DropdownButton(
-                  isExpanded: true,
-                  value: type_user,
-                  iconSize: 24,
-                  elevation: 16,
-                  style: const TextStyle(
-                    color: Colors.black,
-                    fontWeight: FontWeight.bold,
-                    fontFamily: "Lato",
-                  ),
-                  underline: Container(
-                    width: Medidas.width(100),
-                    height: 1,
-                    color: Color.fromRGBO(23, 23, 23, 1),
-                  ),
-                  onChanged: (dynamic? newValue) {
-                    this.setState(() {
-                      this.type_user = newValue!;
-                    });
-                  },
-                  items: perfilesUsuarios.map<DropdownMenuItem>((String value) {
-                    return DropdownMenuItem(
-                      value: value,
-                      child: Text(value),
-                    );
-                  }).toList(),
-                ),
-              ),
-              SizedBox(
-                height: 16,
-              ),
-              Text(
-                "Compañia a la que pertenece el usuario",
-                textAlign: TextAlign.start,
-                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-              ),
-              Divider(),
-              Text(
-                compania,
-                textAlign: TextAlign.start,
-                style: TextStyle(fontSize: 15),
-              ),
-              Divider(),
-              SizedBox(
-                height: 16,
-              ),
-              Text(
-                "Busque el personal para asignar un usuario",
-                textAlign: TextAlign.start,
-                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-              ),
-              StreamBuilder(
-                  stream: FirebaseFirestore.instance.collection("personal").snapshots(),
-                  builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
-                    if (!snapshot.hasData) {
-                      return Center(
-                        child: CircularProgressIndicator(),
-                      );
-                    }
-
-                    List<String> lista = [];
-                    lista = [];
-                    for (dynamic element in snapshot.data!.docs) {
-                      lista.add(element.data()["nombres"].toString().toLowerCase() + ", " + element.data()["apellidos"].toString().toLowerCase());
-                      listaRes.add(element.data());
-                    }
-                    return Autocomplete(
-                      fieldViewBuilder: (context, textEditingController, focusNode, onFieldSubmitted) {
-                        textEditingController.text = nombresTemporal; // You can use the next snip of code if you dont want the initial text to come when you use setState((){});
-
-                        return TextFormField(
-                          controller: textEditingController, //uses fieldViewBuilder TextEditingController
-                          focusNode: focusNode,
-                        );
-                      },
-                      optionsBuilder: (TextEditingValue textEditingValue) {
-                        if (textEditingValue.text == '') {
-                          return const Iterable<String>.empty();
-                        }
-
-                        return lista.where((String option) {
-                          return option.contains(textEditingValue.text.toLowerCase());
-                        });
-                      },
-                      onSelected: (String selection) {
-                        List<String> reasu = selection.split(",");
-                        dynamic lis = listaRes.where((element) => element["nombres"].toString().toLowerCase().trim() == reasu[0].toString().trim()).toList();
-
-                        for (dynamic element in snapshot.data!.docs) {
-                          String nombreCompleto = element.data()["nombres"].toString().toLowerCase() + ", " + element.data()["apellidos"].toString().toLowerCase();
-                          if (nombreCompleto.contains(selection)) {
-                            setState(() {
-                              uid_user = element.data()["uid"];
-                              compania = element.data()["compania"];
-                            });
-                          }
-                        }
-                        setState(() {
-                          this.nombres = selection;
-                          this.nombresTemporal = selection;
-                          compania = lis[0]["compania"];
-                        });
-                        FocusScope.of(context).requestFocus(null);
-                      },
-                    );
-                  }),
-              SizedBox(
-                height: 8,
-              ),
-            ],
+        floatingActionButton: update == false ? ButonGuardar(_formKey, databaseService, context, this.nombres, this.uid_user, this.type_user, compania) : ButonUpdate(_formKey, databaseService, context, nombres, widget.usuario.uid, uid_user, type_user, compania),
+        appBar: AppBar(
+          brightness: Brightness.dark,
+          backgroundColor: Colors.black12,
+          elevation: 0.0,
+          toolbarHeight: 70,
+          flexibleSpace: Container(
+            decoration: BoxDecoration(borderRadius: BorderRadius.only(bottomLeft: Radius.circular(20), bottomRight: Radius.circular(20)), gradient: LinearGradient(colors: [Colors.red, Colors.red.shade900], begin: Alignment.bottomCenter, end: Alignment.topCenter)),
+          ),
+          title: Text(
+            "Datos del usuario",
+            style: TextStyle(color: Colors.black, fontFamily: "Lato", fontWeight: FontWeight.bold),
           ),
         ),
-      )),
-    );
+        body: Container(
+          width: MediaQuery.of(context).size.width,
+          height: MediaQuery.of(context).size.height,
+          color: Colors.black12,
+          child: SingleChildScrollView(
+              child: Form(
+            key: _formKey,
+            autovalidateMode: AutovalidateMode.onUserInteraction,
+            child: Container(
+              padding: EdgeInsets.all(12),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    "Seleccione el tipo de usuario",
+                    textAlign: TextAlign.start,
+                    style: TextStyle(fontWeight: FontWeight.w600),
+                  ),
+                  Container(
+                    alignment: Alignment.center,
+                    color: Colors.black12,
+                    padding: EdgeInsets.all(8),
+                    margin: EdgeInsets.all(0),
+                    child: DropdownButton(
+                      isExpanded: true,
+                      value: type_user,
+                      iconSize: 24,
+                      elevation: 16,
+                      style: const TextStyle(
+                        color: Colors.black,
+                        fontWeight: FontWeight.bold,
+                        fontFamily: "Lato",
+                      ),
+                      underline: Container(
+                        width: Medidas.width(100),
+                        height: 1,
+                        color: Color.fromRGBO(23, 23, 23, 1),
+                      ),
+                      onChanged: (dynamic? newValue) {
+                        this.setState(() {
+                          this.type_user = newValue!;
+                        });
+                      },
+                      items: perfilesUsuarios.map<DropdownMenuItem>((String value) {
+                        return DropdownMenuItem(
+                          value: value,
+                          child: Text(value),
+                        );
+                      }).toList(),
+                    ),
+                  ),
+                  SizedBox(
+                    height: 16,
+                  ),
+                  Text(
+                    "Compañia a la que pertenece el usuario",
+                    textAlign: TextAlign.start,
+                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                  ),
+                  Divider(),
+                  Text(
+                    compania,
+                    textAlign: TextAlign.start,
+                    style: TextStyle(fontSize: 15),
+                  ),
+                  Divider(),
+                  SizedBox(
+                    height: 16,
+                  ),
+                  Text(
+                    "Busque el personal para asignar un usuario",
+                    textAlign: TextAlign.start,
+                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                  ),
+                  StreamBuilder(
+                      stream: FirebaseFirestore.instance.collection("personal").snapshots(),
+                      builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
+                        if (!snapshot.hasData) {
+                          return Center(
+                            child: CircularProgressIndicator(),
+                          );
+                        }
+
+                        List<String> lista = [];
+                        lista = [];
+                        for (dynamic element in snapshot.data!.docs) {
+                          lista.add(element.data()["nombres"].toString().toLowerCase() + ", " + element.data()["apellidos"].toString().toLowerCase());
+                          listaRes.add(element.data());
+                        }
+                        return Autocomplete(
+                          fieldViewBuilder: (context, textEditingController, focusNode, onFieldSubmitted) {
+                            textEditingController.text = nombresTemporal; // You can use the next snip of code if you dont want the initial text to come when you use setState((){});
+
+                            return TextFormField(
+                              controller: textEditingController, //uses fieldViewBuilder TextEditingController
+                              focusNode: focusNode,
+                            );
+                          },
+                          optionsBuilder: (TextEditingValue textEditingValue) {
+                            if (textEditingValue.text == '') {
+                              return const Iterable<String>.empty();
+                            }
+
+                            return lista.where((String option) {
+                              return option.contains(textEditingValue.text.toLowerCase());
+                            });
+                          },
+                          onSelected: (String selection) {
+                            List<String> reasu = selection.split(",");
+                            dynamic lis = listaRes.where((element) => element["nombres"].toString().toLowerCase().trim() == reasu[0].toString().trim()).toList();
+
+                            for (dynamic element in snapshot.data!.docs) {
+                              String nombreCompleto = element.data()["nombres"].toString().toLowerCase() + ", " + element.data()["apellidos"].toString().toLowerCase();
+                              if (nombreCompleto.contains(selection)) {
+                                setState(() {
+                                  uid_user = element.data()["uid"];
+                                  compania = element.data()["compania"];
+                                });
+                              }
+                            }
+                            setState(() {
+                              this.nombres = selection;
+                              this.nombresTemporal = selection;
+                              compania = lis[0]["compania"];
+                            });
+                            FocusScope.of(context).requestFocus(null);
+                          },
+                        );
+                      }),
+                  SizedBox(
+                    height: 8,
+                  ),
+                ],
+              ),
+            ),
+          )),
+        ));
   }
 }
 

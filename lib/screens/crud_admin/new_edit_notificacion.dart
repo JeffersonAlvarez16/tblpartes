@@ -35,55 +35,64 @@ class _NewEditNotificacionState extends State<NewEditNotificacion> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      floatingActionButton: update == false ? ButonGuardar(_formKey, databaseService, context, this.name, this.subject) : ButonUpdate(_formKey, databaseService, context, name, this.subject, widget.notificaciones.uid),
-      appBar: AppBar(
-        iconTheme: IconThemeData(color: Colors.black),
-        backgroundColor: Color.fromRGBO(237, 237, 237, 1),
-        title: Text(
-          "Datos de la notificación",
-          style: TextStyle(color: Colors.black, fontFamily: "Lato", fontWeight: FontWeight.bold),
-        ),
-      ),
-      body: SingleChildScrollView(
-          child: Form(
-        key: _formKey,
-        autovalidateMode: AutovalidateMode.onUserInteraction,
-        child: Container(
-          padding: EdgeInsets.all(12),
-          child: Column(
-            children: [
-              textField(
-                  maxlines: 1,
-                  hintText: 'Titutlo',
-                  icono: Icons.lock_open_outlined,
-                  obscureText: false,
-                  valor: name,
-                  validator: (value) => value.isEmpty ? "Ingrese titulo de la notificación" : null,
-                  onChanged: (value) {
-                    setState(() {
-                      name = value;
-                    });
-                  }),
-              SizedBox(
-                height: 16,
-              ),
-              textField(
-                  maxlines: 8,
-                  hintText: 'Mensaje',
-                  icono: Icons.lock_open_outlined,
-                  obscureText: false,
-                  valor: subject,
-                  validator: (value) => value.isEmpty ? "Ingrese el mensaje de la notificación" : null,
-                  onChanged: (value) {
-                    setState(() {
-                      subject = value;
-                    });
-                  }),
-            ],
+        floatingActionButton: update == false ? ButonGuardar(_formKey, databaseService, context, this.name, this.subject) : ButonUpdate(_formKey, databaseService, context, name, this.subject, widget.notificaciones.uid),
+        appBar: AppBar(
+          brightness: Brightness.dark,
+          backgroundColor: Colors.black12,
+          elevation: 0.0,
+          toolbarHeight: 70,
+          flexibleSpace: Container(
+            decoration: BoxDecoration(borderRadius: BorderRadius.only(bottomLeft: Radius.circular(20), bottomRight: Radius.circular(20)), gradient: LinearGradient(colors: [Colors.red, Colors.red.shade900], begin: Alignment.bottomCenter, end: Alignment.topCenter)),
+          ),
+          title: Text(
+            "Datos de la notificación",
+            style: TextStyle(color: Colors.white, fontFamily: "Lato", fontWeight: FontWeight.bold),
           ),
         ),
-      )),
-    );
+        body: Container(
+          width: MediaQuery.of(context).size.width,
+          height: MediaQuery.of(context).size.height,
+          color: Colors.black12,
+          child: SingleChildScrollView(
+              child: Form(
+            key: _formKey,
+            autovalidateMode: AutovalidateMode.onUserInteraction,
+            child: Container(
+              padding: EdgeInsets.all(12),
+              child: Column(
+                children: [
+                  textField(
+                      maxlines: 1,
+                      hintText: 'Titutlo',
+                      icono: Icons.lock_open_outlined,
+                      obscureText: false,
+                      valor: name,
+                      validator: (value) => value.isEmpty ? "Ingrese titulo de la notificación" : null,
+                      onChanged: (value) {
+                        setState(() {
+                          name = value;
+                        });
+                      }),
+                  SizedBox(
+                    height: 16,
+                  ),
+                  textField(
+                      maxlines: 8,
+                      hintText: 'Mensaje',
+                      icono: Icons.lock_open_outlined,
+                      obscureText: false,
+                      valor: subject,
+                      validator: (value) => value.isEmpty ? "Ingrese el mensaje de la notificación" : null,
+                      onChanged: (value) {
+                        setState(() {
+                          subject = value;
+                        });
+                      }),
+                ],
+              ),
+            ),
+          )),
+        ));
   }
 }
 
