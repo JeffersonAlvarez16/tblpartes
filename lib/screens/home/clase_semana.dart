@@ -335,6 +335,8 @@ class _ClaseSemanaState extends State<ClaseSemana> {
 
   bool isSwitched = false;
 
+  late Stream<QuerySnapshot<Map<String, dynamic>>> urlSearch = FirebaseFirestore.instance.collection("partes").where("compania", isEqualTo: widget.arguments["compania"]).where("fechaRegistro", isEqualTo: desdeString).snapshots();
+
   String texto = "Sin filtrar";
 
   @override
@@ -500,6 +502,8 @@ class _ClaseSemanaState extends State<ClaseSemana> {
                           return CircularProgressIndicator();
                         }
                         if (snapshot.connectionState == ConnectionState.active && snapshot.hasData) {
+                          List<String>? lisTem = snapshot.data;
+                          lisTem!.add("Todos");
                           return Container(
                             alignment: Alignment.center,
                             color: Colors.black12,
@@ -520,11 +524,19 @@ class _ClaseSemanaState extends State<ClaseSemana> {
                                 color: Color.fromRGBO(23, 23, 23, 1),
                               ),
                               onChanged: (dynamic? newValue) {
-                                setState(() {
-                                  estadoParte = newValue;
-                                });
+                                if (newValue == "Todos") {
+                                  setState(() {
+                                    estadoParte = newValue;
+                                    urlSearch = FirebaseFirestore.instance.collection("partes").where("compania", isEqualTo: widget.arguments["compania"]).where("hora_registro", isEqualTo: horaParte).where("fechaRegistro", isEqualTo: desdeString).snapshots();
+                                  });
+                                } else {
+                                  setState(() {
+                                    estadoParte = newValue;
+                                    urlSearch = FirebaseFirestore.instance.collection("partes").where("compania", isEqualTo: widget.arguments["compania"]).where("hora_registro", isEqualTo: horaParte).where("estado", isEqualTo: newValue).where("fechaRegistro", isEqualTo: desdeString).snapshots();
+                                  });
+                                }
                               },
-                              items: snapshot.data!.map<DropdownMenuItem>((String value) {
+                              items: lisTem.map<DropdownMenuItem>((String value) {
                                 return DropdownMenuItem(
                                   value: value,
                                   child: Text(value),
@@ -543,7 +555,7 @@ class _ClaseSemanaState extends State<ClaseSemana> {
               ),
               if (isSwitched)
                 StreamBuilder(
-                  stream: FirebaseFirestore.instance.collection("partes").where("compania", isEqualTo: widget.arguments["compania"]).where("hora_registro", isEqualTo: horaParte).where("estado", isEqualTo: estadoParte).where("fechaRegistro", isEqualTo: desdeString).snapshots(),
+                  stream: urlSearch,
                   builder: (context, AsyncSnapshot<QuerySnapshot<Map<String, dynamic>>> snapshot) {
                     if (!snapshot.hasData) {
                       return CircularProgressIndicator();
