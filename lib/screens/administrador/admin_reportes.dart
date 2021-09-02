@@ -95,6 +95,7 @@ class _AdminReportesState extends State<AdminReportes> {
     if (picked != null && picked != selectedDate) {
       setState(() {
         desdeString = new DateFormat("dd-MM-yyyy").format(picked);
+        urlSeacrh = FirebaseFirestore.instance.collection("partes").where("fechaRegistro", isEqualTo: desdeString).snapshots();
       });
     }
   }
@@ -163,10 +164,10 @@ class _AdminReportesState extends State<AdminReportes> {
     print("valor total:" + listaTotal.length.toString());
     print("valor ind" + lista.length.toString());
     for (var i = 0; i < listaTotal.length; i++) {
-      if (i <= 17) {
+      if (i <= 15) {
         listaNueva.add(listaTotal[i]);
       } else {
-        if (i == 18) {
+        if (i == 16) {
           listaARR.add(listaNueva);
           listaNueva = [];
           listaNueva.add(listaTotal[i]);
@@ -328,7 +329,7 @@ class _AdminReportesState extends State<AdminReportes> {
       appBar: AppBar(
         iconTheme: IconThemeData(color: Colors.black),
         backgroundColor: Color.fromRGBO(237, 237, 237, 1),
-        title: Text("Gestión de reportes", style: TextStyle(color: Colors.black, fontFamily: "OpenSans", fontWeight: FontWeight.bold)),
+        title: Text("Gestión de reportes", style: TextStyle(color: Colors.black, fontFamily: "Lato", fontWeight: FontWeight.bold)),
       ),
       body: SingleChildScrollView(
           child: Column(mainAxisAlignment: MainAxisAlignment.start, mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.start, children: [
@@ -347,6 +348,7 @@ class _AdminReportesState extends State<AdminReportes> {
                       if (value == true) {
                         DateTime selectedDate = new DateTime.now();
                         String desdeStrings = new DateFormat("dd-MM-yyyy").format(selectedDate);
+                        print(desdeStrings);
                         setState(() {
                           texto = "Aplique filtros";
                           urlSeacrh = FirebaseFirestore.instance.collection("partes").where("fechaRegistro", isEqualTo: desdeStrings).snapshots();
@@ -401,61 +403,6 @@ class _AdminReportesState extends State<AdminReportes> {
             mainAxisAlignment: MainAxisAlignment.start,
             children: [
               SizedBox(
-                height: 16,
-              ),
-              Container(
-                margin: EdgeInsets.only(left: 24, right: 24),
-                child: Text("Seleccione la compañia"),
-              ),
-              StreamBuilder<List<String>>(
-                stream: streamServices.companiaStringString,
-                builder: (context, AsyncSnapshot<List<String>> snapshot) {
-                  if (!snapshot.hasData) {
-                    return CircularProgressIndicator();
-                  }
-                  if (snapshot.connectionState == ConnectionState.active && snapshot.hasData) {
-                    List<String>? lisTem = snapshot.data;
-                    lisTem!.add("Todos");
-                    return Container(
-                      alignment: Alignment.center,
-                      color: Colors.black12,
-                      margin: EdgeInsets.only(left: 24, right: 24),
-                      child: DropdownButton(
-                        isExpanded: true,
-                        value: companiaselect,
-                        iconSize: 24,
-                        elevation: 16,
-                        style: const TextStyle(
-                          color: Colors.black,
-                          fontWeight: FontWeight.bold,
-                          fontFamily: "OpenSans",
-                        ),
-                        underline: Container(
-                          width: Medidas.width(100),
-                          height: 1,
-                          color: Color.fromRGBO(23, 23, 23, 1),
-                        ),
-                        onChanged: (dynamic? newValue) {
-                          DateTime selectedDate = new DateTime.now();
-                          String desdeStrings = new DateFormat("dd-MM-yyyy").format(selectedDate);
-                          setState(() {
-                            companiaselect = newValue;
-                            urlSeacrh = FirebaseFirestore.instance.collection("partes").where("fechaRegistro", isEqualTo: desdeStrings).where("compania", isEqualTo: newValue).snapshots();
-                          });
-                        },
-                        items: lisTem.map<DropdownMenuItem>((String value) {
-                          return DropdownMenuItem(
-                            value: value,
-                            child: Text(value),
-                          );
-                        }).toList(),
-                      ),
-                    );
-                  }
-                  return Text("");
-                },
-              ),
-              SizedBox(
                 height: 24,
               ),
               Container(
@@ -483,7 +430,7 @@ class _AdminReportesState extends State<AdminReportes> {
                         style: const TextStyle(
                           color: Colors.black,
                           fontWeight: FontWeight.bold,
-                          fontFamily: "OpenSans",
+                          fontFamily: "Lato",
                         ),
                         underline: Container(
                           width: Medidas.width(100),
@@ -491,12 +438,60 @@ class _AdminReportesState extends State<AdminReportes> {
                           color: Color.fromRGBO(23, 23, 23, 1),
                         ),
                         onChanged: (dynamic? newValue) {
-                          DateTime selectedDate = new DateTime.now();
-                          String desdeStrings = new DateFormat("dd-MM-yyyy").format(selectedDate);
-                          setState(() {
-                            horaParte = newValue;
-                            urlSeacrh = FirebaseFirestore.instance.collection("partes").where("hora_registro", isEqualTo: newValue).where("fechaRegistro", isEqualTo: desdeStrings).where("compania", isEqualTo: companiaselect).snapshots();
-                          });
+                          if (newValue == "Todos" && estadoParte == "Todos" && companiaselect == "Todos") {
+                            setState(() {
+                              horaParte = newValue;
+                              urlSeacrh = FirebaseFirestore.instance.collection("partes").where("fechaRegistro", isEqualTo: desdeString).snapshots();
+                            });
+                            return;
+                          }
+                          if (newValue == "Todos" && estadoParte == "Todos") {
+                            setState(() {
+                              horaParte = newValue;
+                              urlSeacrh = FirebaseFirestore.instance.collection("partes").where("fechaRegistro", isEqualTo: desdeString).where("compania", isEqualTo: companiaselect).snapshots();
+                            });
+                            return;
+                          }
+                          if (companiaselect == "Todos" && estadoParte == "Todos") {
+                            print(newValue);
+                            setState(() {
+                              horaParte = newValue;
+                              urlSeacrh = FirebaseFirestore.instance.collection("partes").where("fechaRegistro", isEqualTo: desdeString).where("hora_registro", isEqualTo: newValue).snapshots();
+                            });
+                            return;
+                          }
+                          if (newValue == "Todos" && companiaselect == "Todos") {
+                            setState(() {
+                              horaParte = newValue;
+                              urlSeacrh = FirebaseFirestore.instance.collection("partes").where("fechaRegistro", isEqualTo: desdeString).where("estado", isEqualTo: estadoParte).snapshots();
+                            });
+                            return;
+                          }
+                          if (companiaselect == "Todos") {
+                            setState(() {
+                              horaParte = newValue;
+                              urlSeacrh = FirebaseFirestore.instance.collection("partes").where("fechaRegistro", isEqualTo: desdeString).where("estado", isEqualTo: estadoParte).where("hora_registro", isEqualTo: newValue).snapshots();
+                            });
+                            return;
+                          }
+                          if (estadoParte == "Todos") {
+                            setState(() {
+                              horaParte = newValue;
+                              urlSeacrh = FirebaseFirestore.instance.collection("partes").where("hora_registro", isEqualTo: newValue).where("fechaRegistro", isEqualTo: desdeString).where("compania", isEqualTo: companiaselect).snapshots();
+                            });
+                            return;
+                          }
+                          if (newValue == "Todos" && estadoParte != "Todos" && companiaselect != "Todos") {
+                            setState(() {
+                              horaParte = newValue;
+                              urlSeacrh = FirebaseFirestore.instance.collection("partes").where("fechaRegistro", isEqualTo: desdeString).where("compania", isEqualTo: companiaselect).where("estado", isEqualTo: estadoParte).snapshots();
+                            });
+                          } else {
+                            setState(() {
+                              horaParte = newValue;
+                              urlSeacrh = FirebaseFirestore.instance.collection("partes").where("hora_registro", isEqualTo: newValue).where("fechaRegistro", isEqualTo: desdeString).where("compania", isEqualTo: companiaselect).where("estado", isEqualTo: estadoParte).snapshots();
+                            });
+                          }
                         },
                         items: lisTem.map<DropdownMenuItem>((String value) {
                           return DropdownMenuItem(
@@ -538,7 +533,7 @@ class _AdminReportesState extends State<AdminReportes> {
                         style: const TextStyle(
                           color: Colors.black,
                           fontWeight: FontWeight.bold,
-                          fontFamily: "OpenSans",
+                          fontFamily: "Lato",
                         ),
                         underline: Container(
                           width: Medidas.width(100),
@@ -546,12 +541,174 @@ class _AdminReportesState extends State<AdminReportes> {
                           color: Color.fromRGBO(23, 23, 23, 1),
                         ),
                         onChanged: (dynamic? newValue) {
-                          DateTime selectedDate = new DateTime.now();
-                          String desdeStrings = new DateFormat("dd-MM-yyyy").format(selectedDate);
-                          setState(() {
-                            estadoParte = newValue;
-                            urlSeacrh = FirebaseFirestore.instance.collection("partes").where("estado", isEqualTo: newValue).where("hora_registro", isEqualTo: horaParte).where("fechaRegistro", isEqualTo: desdeStrings).where("compania", isEqualTo: companiaselect).snapshots();
-                          });
+                          if (newValue == "Todos" && horaParte == "Todos" && companiaselect == "Todos") {
+                            setState(() {
+                              estadoParte = newValue;
+                              urlSeacrh = FirebaseFirestore.instance.collection("partes").where("fechaRegistro", isEqualTo: desdeString).snapshots();
+                            });
+                            return;
+                          }
+                          if (newValue == "Todos" && horaParte == "Todos") {
+                            setState(() {
+                              estadoParte = newValue;
+                              urlSeacrh = FirebaseFirestore.instance.collection("partes").where("fechaRegistro", isEqualTo: desdeString).where("compania", isEqualTo: companiaselect).snapshots();
+                            });
+                            return;
+                          }
+                          if (companiaselect == "Todos" && horaParte == "Todos") {
+                            setState(() {
+                              estadoParte = newValue;
+                              urlSeacrh = FirebaseFirestore.instance.collection("partes").where("fechaRegistro", isEqualTo: desdeString).where("estado", isEqualTo: newValue).snapshots();
+                            });
+                            return;
+                          }
+                          if (newValue == "Todos" && companiaselect == "Todos") {
+                            print("entro busqueda");
+                            print(newValue);
+                            print(companiaselect);
+                            print(horaParte);
+
+                            setState(() {
+                              estadoParte = newValue;
+                              urlSeacrh = FirebaseFirestore.instance.collection("partes").where("fechaRegistro", isEqualTo: desdeString).where("hora_registro", isEqualTo: horaParte).snapshots();
+                            });
+                            return;
+                          }
+                          if (companiaselect == "Todos") {
+                            setState(() {
+                              estadoParte = newValue;
+                              urlSeacrh = FirebaseFirestore.instance.collection("partes").where("fechaRegistro", isEqualTo: desdeString).where("estado", isEqualTo: newValue).where("hora_registro", isEqualTo: horaParte).snapshots();
+                            });
+                            return;
+                          }
+                          if (horaParte == "Todos") {
+                            setState(() {
+                              estadoParte = newValue;
+                              urlSeacrh = FirebaseFirestore.instance.collection("partes").where("estado", isEqualTo: newValue).where("fechaRegistro", isEqualTo: desdeString).where("compania", isEqualTo: companiaselect).snapshots();
+                            });
+                            return;
+                          }
+                          if (newValue == "Todos" && horaParte != "Todos" && companiaselect != "Todos") {
+                            setState(() {
+                              estadoParte = newValue;
+                              urlSeacrh = FirebaseFirestore.instance.collection("partes").where("fechaRegistro", isEqualTo: desdeString).where("compania", isEqualTo: companiaselect).where("hora_registro", isEqualTo: horaParte).snapshots();
+                            });
+                          } else {
+                            setState(() {
+                              estadoParte = newValue;
+                              urlSeacrh = FirebaseFirestore.instance.collection("partes").where("estado", isEqualTo: newValue).where("hora_registro", isEqualTo: horaParte).where("fechaRegistro", isEqualTo: desdeString).where("compania", isEqualTo: companiaselect).snapshots();
+                            });
+                          }
+                        },
+                        items: lisTem.map<DropdownMenuItem>((String value) {
+                          return DropdownMenuItem(
+                            value: value,
+                            child: Text(value),
+                          );
+                        }).toList(),
+                      ),
+                    );
+                  }
+                  return Text("");
+                },
+              ),
+              SizedBox(
+                height: 16,
+              ),
+              Container(
+                margin: EdgeInsets.only(left: 24, right: 24),
+                child: Text("Seleccione la compañia"),
+              ),
+              StreamBuilder<List<String>>(
+                stream: streamServices.companiaStringString,
+                builder: (context, AsyncSnapshot<List<String>> snapshot) {
+                  if (!snapshot.hasData) {
+                    return CircularProgressIndicator();
+                  }
+                  if (snapshot.connectionState == ConnectionState.active && snapshot.hasData) {
+                    List<String>? lisTem = snapshot.data;
+                    lisTem!.add("Todos");
+                    return Container(
+                      alignment: Alignment.center,
+                      color: Colors.black12,
+                      margin: EdgeInsets.only(left: 24, right: 24),
+                      child: DropdownButton(
+                        isExpanded: true,
+                        value: companiaselect,
+                        iconSize: 24,
+                        elevation: 16,
+                        style: const TextStyle(
+                          color: Colors.black,
+                          fontWeight: FontWeight.bold,
+                          fontFamily: "Lato",
+                        ),
+                        underline: Container(
+                          width: Medidas.width(100),
+                          height: 1,
+                          color: Color.fromRGBO(23, 23, 23, 1),
+                        ),
+                        onChanged: (dynamic? newValue) {
+                          if (newValue == "Todos" && horaParte == "Todos" && estadoParte == "Todos") {
+                            setState(() {
+                              companiaselect = newValue;
+                              urlSeacrh = FirebaseFirestore.instance.collection("partes").where("fechaRegistro", isEqualTo: desdeString).snapshots();
+                            });
+                            return;
+                          }
+                          if (newValue == "Todos" && horaParte == "Todos") {
+                            setState(() {
+                              companiaselect = newValue;
+                              urlSeacrh = FirebaseFirestore.instance.collection("partes").where("fechaRegistro", isEqualTo: desdeString).where("estado", isEqualTo: estadoParte).snapshots();
+                            });
+                            return;
+                          }
+                          if (newValue == "Todos" && estadoParte == "Todos") {
+                            setState(() {
+                              companiaselect = newValue;
+                              urlSeacrh = FirebaseFirestore.instance.collection("partes").where("fechaRegistro", isEqualTo: desdeString).where("hora_registro", isEqualTo: horaParte).snapshots();
+                            });
+                            return;
+                          }
+                          if (horaParte == "Todos" && estadoParte == "Todos") {
+                            setState(() {
+                              companiaselect = newValue;
+                              urlSeacrh = FirebaseFirestore.instance.collection("partes").where("fechaRegistro", isEqualTo: desdeString).where("compania", isEqualTo: newValue).snapshots();
+                            });
+                            return;
+                          }
+
+                          if (horaParte == "Todos") {
+                            setState(() {
+                              companiaselect = newValue;
+                              urlSeacrh = FirebaseFirestore.instance.collection("partes").where("estado", isEqualTo: estadoParte).where("fechaRegistro", isEqualTo: desdeString).where("compania", isEqualTo: newValue).snapshots();
+                            });
+                            return;
+                          }
+                          if (estadoParte == "Todos") {
+                            setState(() {
+                              companiaselect = newValue;
+                              urlSeacrh = FirebaseFirestore.instance.collection("partes").where("hora_registro", isEqualTo: horaParte).where("fechaRegistro", isEqualTo: desdeString).where("compania", isEqualTo: newValue).snapshots();
+                            });
+                            return;
+                          }
+                          if (newValue == "Todos") {
+                            setState(() {
+                              companiaselect = newValue;
+                              urlSeacrh = FirebaseFirestore.instance.collection("partes").where("fechaRegistro", isEqualTo: desdeString).where("estado", isEqualTo: estadoParte).where("hora_registro", isEqualTo: horaParte).snapshots();
+                            });
+                            return;
+                          }
+                          if (newValue == "Todos") {
+                            setState(() {
+                              companiaselect = newValue;
+                              urlSeacrh = FirebaseFirestore.instance.collection("partes").where("fechaRegistro", isEqualTo: desdeString).where("estado", isEqualTo: estadoParte).where("hora_registro", isEqualTo: horaParte).snapshots();
+                            });
+                          } else {
+                            setState(() {
+                              companiaselect = newValue;
+                              urlSeacrh = FirebaseFirestore.instance.collection("partes").where("estado", isEqualTo: estadoParte).where("hora_registro", isEqualTo: horaParte).where("fechaRegistro", isEqualTo: desdeString).where("compania", isEqualTo: newValue).snapshots();
+                            });
+                          }
                         },
                         items: lisTem.map<DropdownMenuItem>((String value) {
                           return DropdownMenuItem(
@@ -581,6 +738,7 @@ class _AdminReportesState extends State<AdminReportes> {
                 List<dynamic> list = snapshot.data!.docs.map((DocumentSnapshot doc) {
                   return doc.data();
                 }).toList();
+
                 List<dynamic> listrep = [];
                 lista = [];
 
@@ -737,34 +895,25 @@ class _AdminReportesState extends State<AdminReportes> {
             SizedBox(
               height: 12,
             ),
-            generando == false
-                ? Container(
-                    width: Medidas.width(100),
-                    margin: EdgeInsets.only(left: 24, right: 24),
-                    child: ElevatedButton(
-                        onPressed: () async {
-                          if (lista.length == 0) {
-                            final snackBar = SnackBar(content: Text('No hay registros descargar'));
-                            ScaffoldMessenger.of(context).showSnackBar(snackBar);
-                            return;
-                          }
-                          if (nameFile!.length > 0) {
-                            saveVideo();
-                          } else {
-                            final snackBar = SnackBar(content: Text('Debe ingresar el nombre del archivo'));
-                            ScaffoldMessenger.of(context).showSnackBar(snackBar);
-                          }
-                        },
-                        child: Text("Descargar Reporte")),
-                  )
-                : Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      Text("Generando PDF"),
-                      CircularProgressIndicator(),
-                    ],
-                  )
+            Container(
+              width: Medidas.width(100),
+              margin: EdgeInsets.only(left: 24, right: 24),
+              child: ElevatedButton(
+                  onPressed: () async {
+                    if (lista.length == 0) {
+                      final snackBar = SnackBar(content: Text('No hay registros descargar'));
+                      ScaffoldMessenger.of(context).showSnackBar(snackBar);
+                      return;
+                    }
+                    if (nameFile!.length > 0) {
+                      saveVideo();
+                    } else {
+                      final snackBar = SnackBar(content: Text('Debe ingresar el nombre del archivo'));
+                      ScaffoldMessenger.of(context).showSnackBar(snackBar);
+                    }
+                  },
+                  child: Text("Descargar Reporte")),
+            ),
           ],
         ),
       ])),
@@ -775,7 +924,7 @@ class _AdminReportesState extends State<AdminReportes> {
 Widget label(String text, Color color, double size) {
   return Text(
     text,
-    style: TextStyle(color: color, fontSize: size > 14 ? size : 14, fontFamily: "OpenSans", fontWeight: FontWeight.bold),
+    style: TextStyle(color: color, fontSize: size > 14 ? size : 14, fontFamily: "Lato", fontWeight: FontWeight.bold),
   );
 }
 
@@ -794,7 +943,7 @@ Widget textField({String? hintText, IconData? icono, bool obscureText = false, b
               ? true
               : false,
       onChanged: onChanged,
-      style: TextStyle(color: Colors.black, fontSize: 14, fontWeight: FontWeight.bold, fontFamily: "OpenSans", fontStyle: FontStyle.normal),
+      style: TextStyle(color: Colors.black, fontSize: 14, fontWeight: FontWeight.bold, fontFamily: "Lato", fontStyle: FontStyle.normal),
       textAlign: TextAlign.justify,
       decoration: InputDecoration(
           suffixIcon: pass == true

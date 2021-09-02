@@ -26,25 +26,15 @@ class _AdminEstadosState extends State<AdminEstados> {
           floatingActionButton: TextButton(
               child: Text(
                 "Registrar Estados",
-                style: TextStyle(
-                    color: Colors.white, fontFamily: "OpenSans", fontSize: 14),
+                style: TextStyle(color: Colors.white, fontFamily: "Lato", fontSize: 14),
               ),
-              style: ButtonStyle(
-                  backgroundColor:
-                      MaterialStateProperty.all(Color.fromRGBO(218, 0, 55, 1))),
+              style: ButtonStyle(backgroundColor: MaterialStateProperty.all(Color.fromRGBO(218, 0, 55, 1))),
               onPressed: () {
                 Navigator.push(
                   context,
                   MaterialPageRoute(builder: (context) {
                     return NewEditEstados(
-                      estados: new Estados(
-                          nombre: "",
-                          uid: "",
-                          nota: false,
-                          fechas: false,
-                          listado: false,
-                          lista: listas,
-                          estado: false),
+                      estados: new Estados(nombre: "", uid: "", nota: false, fechas: false, listado: false, lista: listas, estado: false),
                     );
                   }),
                 );
@@ -73,10 +63,7 @@ class _AdminEstadosState extends State<AdminEstados> {
             ],
             title: Text(
               "Gestión de Estados",
-              style: TextStyle(
-                  color: Colors.black,
-                  fontFamily: "OpenSans",
-                  fontWeight: FontWeight.bold),
+              style: TextStyle(color: Colors.black, fontFamily: "Lato", fontWeight: FontWeight.bold),
             ),
           ),
           body: EstadosListas(),

@@ -11,6 +11,7 @@ import 'package:tblpartes/models/notificaciones.dart';
 import 'package:tblpartes/models/user.dart';
 import 'package:tblpartes/models/usuarios.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:http/http.dart' as http;
 
 class DatabaseService {
   final FirebaseFirestore firestore = FirebaseFirestore.instance;
@@ -56,7 +57,24 @@ class DatabaseService {
   }
 
   Future<void> createParte(String uid, Map<String, dynamic> parte) async {
+    await firestore.collection("personal").doc(parte["uid_personal"]).update({
+      "desde": parte["desde"],
+      "hasta": parte["hasta"],
+    });
     return await firestore.collection("partes").doc(uid).set(parte);
+  }
+
+  Future<String> fetchPost(String desdeString) async {
+    var url = Uri.parse('https://us-central1-tbl-partes.cloudfunctions.net/saveParte');
+    dynamic response = await http.post(url, body: {"fecha": desdeString});
+    print(response.body);
+    dynamic respuesta = json.decode(response.body);
+    print(respuesta["result"]);
+    if (response.statusCode == 200) {
+      return respuesta["result"].toString();
+    } else {
+      return "null";
+    }
   }
 
 //////////////////////////////////////////////////////////////////////
@@ -180,7 +198,7 @@ class DatabaseService {
 
       String json = jsonEncode(doc.data());
       Map<String, dynamic> personal = jsonDecode(json);
-      return UserModel.fromUserModel(uid: personal['uid'] ?? "", token: personal["token"] ?? "", apellidos: personal['apellidos'] ?? '', grado: personal['grado'] ?? '', nombres: personal['nombres'] ?? '', batallon: personal['batallon'] ?? '', compania: personal['compania'] ?? '', email: personal['email'] ?? '', typeUser: personal['typeUser'] ?? '', cedula: personal['cedula'] ?? '');
+      return UserModel.fromUserModel(uid: personal['uid'] ?? "", hasta: personal["hasta"] ?? "", token: personal["token"] ?? "", apellidos: personal['apellidos'] ?? '', grado: personal['grado'] ?? '', nombres: personal['nombres'] ?? '', batallon: personal['batallon'] ?? '', compania: personal['compania'] ?? '', email: personal['email'] ?? '', typeUser: personal['typeUser'] ?? '', cedula: personal['cedula'] ?? '');
     }).toList();
   }
 
@@ -229,7 +247,7 @@ class DatabaseService {
     return snapshot.docs.map((QueryDocumentSnapshot doc) {
       dynamic data = doc.data();
 
-      return Horarios(hora: data["hora"], uid: data["uid"], createAt: data["createAt"].toDate());
+      return Horarios(hora: data["hora"], uid: data["uid"], createAt: data["createAt"].toDate(), estado: data["estado"]);
     }).toList();
   }
 
@@ -325,7 +343,7 @@ class DatabaseService {
 
   Stream<QuerySnapshot<Map<String, dynamic>>> notificacionesExistentes() {
     String uid = _auth.currentUser!.uid;
-
+    print(uid);
     return firestore.collection("notification").where("uid", isEqualTo: uid).orderBy("create").snapshots();
   }
 
@@ -349,6 +367,16 @@ class DatabaseService {
 
   Future cambiarEstadoNotiUser(String notificacion) async {
     return await firestore.collection("notifications").doc(notificacion).update({"atendido": true});
+  }
+
+  Future cambiarEstadoHorarios(String id) async {
+    await cambiarEstadoHorariosOther();
+    return await firestore.collection("horarios").doc(id).update({"estado": true});
+  }
+
+  Future cambiarEstadoHorariosOther() async {
+    QuerySnapshot<Map<String, dynamic>> lista = await firestore.collection("horarios").where("estado", isEqualTo: true).get();
+    return await firestore.collection("horarios").doc(lista.docs[0].id).update({"estado": false});
   }
 
   Future<QuerySnapshot<Map<String, dynamic>>> existeUsuario(String typeUser) async {

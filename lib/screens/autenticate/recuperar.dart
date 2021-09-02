@@ -36,15 +36,13 @@ class _RecuperarState extends State<Recuperar> {
                     hintText: 'Cedula',
                     icono: Icons.lock_open_outlined,
                     obscureText: true,
-                    validator: (value) =>
-                        value.isEmpty ? "Ingrese la cedula" : null,
+                    validator: (value) => value.isEmpty ? "Ingrese la cedula" : null,
                     onChanged: (value) {
                       setState(() {
                         email = value;
                       });
                     }),
-                label("Se enviara un correo de recuperación de contraseña",
-                    Colors.white, 12),
+                label("Se enviara un correo de recuperación de contraseña", Colors.white, 12),
                 SizedBox(
                   height: Medidas.heigth(8),
                 ),
@@ -67,18 +65,13 @@ class _RecuperarState extends State<Recuperar> {
                         var correo = await databaseService.getCorreo(email);
 
                         if (correo == "null") {
-                          final snackBar =
-                              SnackBar(content: Text('No existe este usuario'));
+                          final snackBar = SnackBar(content: Text('No existe este usuario'));
                           ScaffoldMessenger.of(context).showSnackBar(snackBar);
                         } else {
                           try {
                             await databaseService.resetPassword(correo);
-                            final snackBar = SnackBar(
-                                content: Text(
-                                    'Se envio el correo de recuperación a: ' +
-                                        correo));
-                            ScaffoldMessenger.of(context)
-                                .showSnackBar(snackBar);
+                            final snackBar = SnackBar(content: Text('Se envio el correo de recuperación a: ' + correo));
+                            ScaffoldMessenger.of(context).showSnackBar(snackBar);
                           } catch (e) {
                             final snackBar = SnackBar(
                                 backgroundColor: Colors.redAccent,
@@ -86,8 +79,7 @@ class _RecuperarState extends State<Recuperar> {
                                   'Error al enviar el correo de recuperación',
                                   style: TextStyle(color: Colors.white),
                                 ));
-                            ScaffoldMessenger.of(context)
-                                .showSnackBar(snackBar);
+                            ScaffoldMessenger.of(context).showSnackBar(snackBar);
                           }
                         }
                       }
@@ -114,13 +106,7 @@ class _RecuperarState extends State<Recuperar> {
   }
 }
 
-Widget textField(
-    {String? hintText,
-    IconData? icono,
-    bool obscureText = false,
-    Function(String)? onChanged,
-    dynamic validator,
-    TextInputType textInputTipe = TextInputType.text}) {
+Widget textField({String? hintText, IconData? icono, bool obscureText = false, Function(String)? onChanged, dynamic validator, TextInputType textInputTipe = TextInputType.text}) {
   return Container(
     decoration: BoxDecoration(
       color: Colors.white12,
@@ -131,12 +117,7 @@ Widget textField(
       keyboardType: textInputTipe,
       obscureText: obscureText,
       onChanged: onChanged,
-      style: TextStyle(
-          color: Colors.white,
-          fontSize: 14,
-          fontWeight: FontWeight.bold,
-          fontFamily: "OpenSans",
-          fontStyle: FontStyle.normal),
+      style: TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.bold, fontFamily: "Lato", fontStyle: FontStyle.normal),
       textAlign: TextAlign.justify,
       decoration: InputDecoration(
           labelText: hintText,

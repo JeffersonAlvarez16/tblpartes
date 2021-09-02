@@ -1,7 +1,9 @@
 import 'dart:typed_data';
 
 import 'package:badges/badges.dart';
+import 'package:clock/clock.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:date_format/date_format.dart';
 import 'package:dio/dio.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
@@ -124,7 +126,7 @@ class _ComandanteCompaniaState extends State<ComandanteCompania> {
             });
       }
     });
-    streamServices.horariosString.listen((event) {
+    streamServices.horariosStringTrue.listen((event) {
       setState(() {
         horaParte = event.first;
       });
@@ -244,10 +246,10 @@ class _ComandanteCompaniaState extends State<ComandanteCompania> {
     print("valor total:" + listaTotal.length.toString());
     print("valor ind" + lista.length.toString());
     for (var i = 0; i < listaTotal.length; i++) {
-      if (i <= 17) {
+      if (i <= 15) {
         listaNueva.add(listaTotal[i]);
       } else {
-        if (i == 18) {
+        if (i == 16) {
           listaARR.add(listaNueva);
           listaNueva = [];
           listaNueva.add(listaTotal[i]);
@@ -407,7 +409,19 @@ class _ComandanteCompaniaState extends State<ComandanteCompania> {
   @override
   Widget build(BuildContext context) {
     List<Widget> _widgetOptions = <Widget>[
-      Home(context, widget.arguments["compania"]),
+      StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
+        stream: FirebaseFirestore.instance.collection("horarios").where("estado", isEqualTo: true).snapshots(),
+        builder: (context, AsyncSnapshot<QuerySnapshot<Map<String, dynamic>>> snapshot) {
+          if (!snapshot.hasData) {
+            return CircularProgressIndicator();
+          }
+          if (snapshot.hasData && snapshot.connectionState == ConnectionState.active) {
+            Map<String, dynamic> data = snapshot.data!.docs[0].data();
+            return Home(context, widget.arguments["compania"], data["hora"]);
+          }
+          return CircularProgressIndicator();
+        },
+      ),
       SingleChildScrollView(
         child: SizedBox(
             height: MediaQuery.of(context).size.height,
@@ -507,7 +521,7 @@ class _ComandanteCompaniaState extends State<ComandanteCompania> {
                               style: const TextStyle(
                                 color: Colors.black,
                                 fontWeight: FontWeight.bold,
-                                fontFamily: "OpenSans",
+                                fontFamily: "Lato",
                               ),
                               underline: Container(
                                 width: Medidas.width(100),
@@ -557,7 +571,7 @@ class _ComandanteCompaniaState extends State<ComandanteCompania> {
                               style: const TextStyle(
                                 color: Colors.black,
                                 fontWeight: FontWeight.bold,
-                                fontFamily: "OpenSans",
+                                fontFamily: "Lato",
                               ),
                               underline: Container(
                                 width: Medidas.width(100),
@@ -842,7 +856,7 @@ class _ComandanteCompaniaState extends State<ComandanteCompania> {
             children: [
               Text(
                 'Comandante de Compañia',
-                style: TextStyle(fontFamily: "OpenSans", fontWeight: FontWeight.bold, color: Colors.black, fontSize: 14),
+                style: TextStyle(fontFamily: "Lato", fontWeight: FontWeight.bold, color: Colors.black, fontSize: 14),
               ),
               label(widget.arguments["compania"], Colors.black, 10)
             ],
@@ -878,14 +892,10 @@ class _ComandanteCompaniaState extends State<ComandanteCompania> {
   }
 }
 
-Widget Home(context, compania) {
+Widget Home(context, compania, hora) {
   DateTime selectedDate = new DateTime.now();
   String desdeString = new DateFormat("dd-MM-yyyy").format(selectedDate);
-
   return SingleChildScrollView(
-      child: SizedBox(
-    height: MediaQuery.of(context).size.height,
-    width: MediaQuery.of(context).size.width,
     child: Column(crossAxisAlignment: CrossAxisAlignment.start, mainAxisAlignment: MainAxisAlignment.start, children: [
       SizedBox(
         height: 12,
@@ -895,7 +905,7 @@ Widget Home(context, compania) {
         child: label("Lista de registros", Colors.black, 18),
       ),
       StreamBuilder(
-        stream: FirebaseFirestore.instance.collection("partes").where("compania", isEqualTo: compania).where("fechaRegistro", isEqualTo: desdeString).snapshots(),
+        stream: FirebaseFirestore.instance.collection("partes").where("compania", isEqualTo: compania).where("fechaRegistro", isEqualTo: desdeString).where("hora_registro", isEqualTo: hora).snapshots(),
         builder: (context, AsyncSnapshot<QuerySnapshot<Map<String, dynamic>>> snapshot) {
           if (!snapshot.hasData) {
             return CircularProgressIndicator();
@@ -963,7 +973,7 @@ Widget Home(context, compania) {
         },
       ),
       StreamBuilder(
-        stream: FirebaseFirestore.instance.collection("partes").where("compania", isEqualTo: compania).where("fechaRegistro", isEqualTo: desdeString).snapshots(),
+        stream: FirebaseFirestore.instance.collection("partes").where("compania", isEqualTo: compania).where("fechaRegistro", isEqualTo: desdeString).where("hora_registro", isEqualTo: hora).snapshots(),
         builder: (context, AsyncSnapshot<QuerySnapshot<Map<String, dynamic>>> snapshot) {
           if (!snapshot.hasData) {
             return CircularProgressIndicator();
@@ -1024,138 +1034,140 @@ Widget Home(context, compania) {
         },
       ),
     ]),
-  ));
+  );
 }
 
 Widget Notificaciones(context, databaseService) {
   return SingleChildScrollView(
+      padding: EdgeInsets.only(bottom: 800),
       child: StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
-    stream: databaseService.notificacionesExistentes(),
-    builder: (context, snapshot) {
-      if (!snapshot.hasData) {
-        return Center(
-          child: Text("Cargango"),
-        );
-      }
-      if (snapshot.connectionState == ConnectionState.active && snapshot.hasData) {
-        List<QueryDocumentSnapshot<Map<String, dynamic>>> lista = snapshot.data!.docs;
+        stream: databaseService.notificacionesExistentes(),
+        builder: (context, snapshot) {
+          if (!snapshot.hasData) {
+            return Center(
+              child: Text("Cargango"),
+            );
+          }
+          if (snapshot.connectionState == ConnectionState.active && snapshot.hasData) {
+            List<QueryDocumentSnapshot<Map<String, dynamic>>> lista = snapshot.data!.docs;
 
-        return SizedBox(
-          height: MediaQuery.of(context).size.height,
-          width: MediaQuery.of(context).size.width,
-          child: ListView.builder(
-            shrinkWrap: true,
-            itemCount: lista.length,
-            itemBuilder: (context, index) {
-              Map<String, dynamic> dataNoti = lista[index].data();
+            return Container(
+              height: MediaQuery.of(context).size.height,
+              width: MediaQuery.of(context).size.width,
+              padding: EdgeInsets.only(bottom: 150),
+              child: ListView.builder(
+                shrinkWrap: true,
+                itemCount: lista.length,
+                itemBuilder: (context, index) {
+                  Map<String, dynamic> dataNoti = lista[index].data();
 
-              return Card(
-                child: Container(
-                  padding: EdgeInsets.all(8),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    mainAxisSize: MainAxisSize.min,
-                    children: <Widget>[
-                      ListTile(
-                        title: Text(dataNoti["name"].toString()),
-                        subtitle: Text(dataNoti["subject"].toString()),
-                      ),
-                      SizedBox(
-                        height: 12,
-                      ),
-                      Container(
-                        padding: EdgeInsets.only(left: 16),
-                        child: Text("Parte anterior: " + dataNoti["parte_anterior"]),
-                      ),
-                      SizedBox(
-                        height: 12,
-                      ),
-                      Container(
-                        padding: EdgeInsets.only(left: 16),
-                        child: Text("Parte Actual: " + dataNoti["parte_nuevo"]),
-                      ),
-                      SizedBox(
-                        height: 16,
-                      ),
-                      if (dataNoti["estado"] == "aceptado")
-                        Container(
-                          margin: EdgeInsets.only(bottom: 12),
-                          padding: EdgeInsets.only(left: 16),
-                          child: Text("Cambio de parte aceptado"),
-                        ),
-                      if (dataNoti["estado"] == "en_espera")
-                        Container(
-                          margin: EdgeInsets.only(bottom: 12),
-                          padding: EdgeInsets.only(left: 16),
-                          child: Text("Cambio de estado a la espera de respuesta"),
-                        ),
-                      if (dataNoti["estado"] == "rechazado")
-                        Container(
-                          margin: EdgeInsets.only(bottom: 12),
-                          padding: EdgeInsets.only(left: 16),
-                          child: Text("Cambio de parte rechazado"),
-                        ),
-                      if (dataNoti["atendido"] == false)
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                          children: [
+                  return Card(
+                    child: Container(
+                      padding: EdgeInsets.all(8),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        mainAxisSize: MainAxisSize.min,
+                        children: <Widget>[
+                          ListTile(
+                            title: Text(dataNoti["name"].toString()),
+                            subtitle: Text(dataNoti["subject"].toString()),
+                          ),
+                          SizedBox(
+                            height: 12,
+                          ),
+                          Container(
+                            padding: EdgeInsets.only(left: 16),
+                            child: Text("Parte anterior: " + dataNoti["parte_anterior"]),
+                          ),
+                          SizedBox(
+                            height: 12,
+                          ),
+                          Container(
+                            padding: EdgeInsets.only(left: 16),
+                            child: Text("Parte Actual: " + dataNoti["parte_nuevo"]),
+                          ),
+                          SizedBox(
+                            height: 16,
+                          ),
+                          if (dataNoti["estado"] == "aceptado")
                             Container(
-                              width: 100,
-                              height: 32,
-                              decoration: BoxDecoration(
-                                  color: Colors.blueGrey,
-                                  borderRadius: BorderRadius.only(
-                                    topLeft: Radius.circular(20),
-                                    bottomRight: Radius.circular(20),
-                                  )),
-                              child: TextButton(
-                                child: Text(
-                                  "Rechazar",
-                                  style: TextStyle(color: Colors.white),
-                                ),
-                                onPressed: () async {
-                                  await databaseService.cambiarParte(dataNoti["id_parte"], lista[index].id, dataNoti["parte_anterior"], false, dataNoti["uid_personal"]);
-                                },
-                              ),
+                              margin: EdgeInsets.only(bottom: 12),
+                              padding: EdgeInsets.only(left: 16),
+                              child: Text("Cambio de parte aceptado"),
                             ),
+                          if (dataNoti["estado"] == "en_espera")
                             Container(
-                              width: 100,
-                              height: 32,
-                              decoration: BoxDecoration(
-                                  color: Color.fromRGBO(218, 0, 55, 1),
-                                  borderRadius: BorderRadius.only(
-                                    topLeft: Radius.circular(20),
-                                    bottomRight: Radius.circular(20),
-                                  )),
-                              child: TextButton(
-                                child: Text(
-                                  "Aceptar",
-                                  style: TextStyle(color: Colors.white),
-                                ),
-                                onPressed: () async {
-                                  await databaseService.cambiarParte(dataNoti["id_parte"], lista[index].id, dataNoti["parte_nuevo"], true, dataNoti["uid_personal"]);
-                                },
-                              ),
+                              margin: EdgeInsets.only(bottom: 12),
+                              padding: EdgeInsets.only(left: 16),
+                              child: Text("Cambio de estado a la espera de respuesta"),
                             ),
-                          ],
-                        ),
-                      SizedBox(
-                        height: 12,
+                          if (dataNoti["estado"] == "rechazado")
+                            Container(
+                              margin: EdgeInsets.only(bottom: 12),
+                              padding: EdgeInsets.only(left: 16),
+                              child: Text("Cambio de parte rechazado"),
+                            ),
+                          if (dataNoti["atendido"] == false)
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                              children: [
+                                Container(
+                                  width: 100,
+                                  height: 32,
+                                  decoration: BoxDecoration(
+                                      color: Colors.blueGrey,
+                                      borderRadius: BorderRadius.only(
+                                        topLeft: Radius.circular(20),
+                                        bottomRight: Radius.circular(20),
+                                      )),
+                                  child: TextButton(
+                                    child: Text(
+                                      "Rechazar",
+                                      style: TextStyle(color: Colors.white),
+                                    ),
+                                    onPressed: () async {
+                                      await databaseService.cambiarParte(dataNoti["id_parte"], lista[index].id, dataNoti["parte_anterior"], false, dataNoti["uid_personal"]);
+                                    },
+                                  ),
+                                ),
+                                Container(
+                                  width: 100,
+                                  height: 32,
+                                  decoration: BoxDecoration(
+                                      color: Color.fromRGBO(218, 0, 55, 1),
+                                      borderRadius: BorderRadius.only(
+                                        topLeft: Radius.circular(20),
+                                        bottomRight: Radius.circular(20),
+                                      )),
+                                  child: TextButton(
+                                    child: Text(
+                                      "Aceptar",
+                                      style: TextStyle(color: Colors.white),
+                                    ),
+                                    onPressed: () async {
+                                      await databaseService.cambiarParte(dataNoti["id_parte"], lista[index].id, dataNoti["parte_nuevo"], true, dataNoti["uid_personal"]);
+                                    },
+                                  ),
+                                ),
+                              ],
+                            ),
+                          SizedBox(
+                            height: 12,
+                          ),
+                        ],
                       ),
-                    ],
-                  ),
-                ),
-              );
-            },
-          ),
-        );
-      }
-      return Center(
-        child: Text("Cargango"),
-      );
-    },
-  ));
+                    ),
+                  );
+                },
+              ),
+            );
+          }
+          return Center(
+            child: Text("Cargango"),
+          );
+        },
+      ));
 }
 
 Future<void> main() async {}
@@ -1163,7 +1175,7 @@ Future<void> main() async {}
 Widget label(String text, Color color, double size) {
   return Text(
     text,
-    style: TextStyle(color: color, fontSize: size > 14 ? size : 14, fontFamily: "OpenSans", fontWeight: FontWeight.bold),
+    style: TextStyle(color: color, fontSize: size > 14 ? size : 14, fontFamily: "Lato", fontWeight: FontWeight.bold),
   );
 }
 
@@ -1182,7 +1194,7 @@ Widget textField({String? hintText, IconData? icono, bool obscureText = false, b
               ? true
               : false,
       onChanged: onChanged,
-      style: TextStyle(color: Colors.black, fontSize: 14, fontWeight: FontWeight.bold, fontFamily: "OpenSans", fontStyle: FontStyle.normal),
+      style: TextStyle(color: Colors.black, fontSize: 14, fontWeight: FontWeight.bold, fontFamily: "Lato", fontStyle: FontStyle.normal),
       textAlign: TextAlign.justify,
       decoration: InputDecoration(
           suffixIcon: pass == true

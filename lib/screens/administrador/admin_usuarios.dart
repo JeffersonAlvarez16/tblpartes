@@ -29,7 +29,7 @@ class _AdminUsuariosState extends State<AdminUsuarios> {
             child: TextButton(
                 child: Text(
                   "Registrar Usuario",
-                  style: TextStyle(color: Colors.white, fontFamily: "OpenSans", fontSize: 14),
+                  style: TextStyle(color: Colors.white, fontFamily: "Lato", fontSize: 14),
                 ),
                 style: ButtonStyle(backgroundColor: MaterialStateProperty.all(Color.fromRGBO(218, 0, 55, 1))),
                 onPressed: () {
@@ -65,7 +65,7 @@ class _AdminUsuariosState extends State<AdminUsuarios> {
             ],
             title: Text(
               "Gestión de usuarios",
-              style: TextStyle(color: Colors.black, fontFamily: "OpenSans", fontWeight: FontWeight.bold),
+              style: TextStyle(color: Colors.black, fontFamily: "Lato", fontWeight: FontWeight.bold),
             ),
           ),
           body: UsuarioslListas(),

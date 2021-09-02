@@ -10,9 +10,10 @@ class UserModel {
   String typeUser = "";
   String cedula = "";
   String token = "";
+  String hasta = "";
 
   UserModel({required this.uid});
-  UserModel.fromUserModel({required this.uid, required this.apellidos, required this.grado, required this.nombres, required this.batallon, required this.compania, required this.cedula, required this.email, required this.token, required this.typeUser});
+  UserModel.fromUserModel({required this.uid, required this.apellidos, required this.grado, required this.nombres, required this.batallon, required this.compania, required this.cedula, required this.email, required this.token, required this.typeUser, required this.hasta});
 
   Map<String, dynamic> toMap() {
     final Map<String, dynamic> data = Map<String, dynamic>();
@@ -26,6 +27,7 @@ class UserModel {
     data['password'] = this.password;
     data['typeUser'] = this.typeUser;
     data['token'] = this.token;
+    data['hasta'] = this.hasta;
 
     return data;
   }

@@ -1,6 +1,7 @@
 import 'dart:typed_data';
 
 import 'package:badges/badges.dart';
+import 'package:clock/clock.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dio/dio.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
@@ -44,24 +45,15 @@ class _ClaseSemanaState extends State<ClaseSemana> {
   String horaParte = "";
   String estadoParte = "";
 
-  void getToken() async {
-    token = await firebaseMessaging.getToken();
-    await databaseService.registrarToken(token);
-    setState(() {
-      nameFile = token;
-    });
-  }
-
   @override
   void initState() {
-    getToken();
     DateTime selectedDate = new DateTime.now();
 
     setState(() {
       desdeString = new DateFormat("dd-MM-yyyy").format(selectedDate);
     });
 
-    streamServices.horariosString.listen((event) {
+    streamServices.horariosStringTrue.listen((event) {
       setState(() {
         horaParte = event.first;
       });
@@ -167,10 +159,10 @@ class _ClaseSemanaState extends State<ClaseSemana> {
     print("valor total:" + listaTotal.length.toString());
     print("valor ind" + lista.length.toString());
     for (var i = 0; i < listaTotal.length; i++) {
-      if (i <= 17) {
+      if (i <= 15) {
         listaNueva.add(listaTotal[i]);
       } else {
-        if (i == 18) {
+        if (i == 16) {
           listaARR.add(listaNueva);
           listaNueva = [];
           listaNueva.add(listaTotal[i]);
@@ -346,7 +338,19 @@ class _ClaseSemanaState extends State<ClaseSemana> {
   @override
   Widget build(BuildContext context) {
     List<Widget> _widgetOptions = <Widget>[
-      Home(context, widget.arguments["compania"]),
+      StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
+        stream: FirebaseFirestore.instance.collection("horarios").where("estado", isEqualTo: true).snapshots(),
+        builder: (context, AsyncSnapshot<QuerySnapshot<Map<String, dynamic>>> snapshot) {
+          if (!snapshot.hasData) {
+            return CircularProgressIndicator();
+          }
+          if (snapshot.hasData && snapshot.connectionState == ConnectionState.active) {
+            Map<String, dynamic> data = snapshot.data!.docs[0].data();
+            return Home(context, widget.arguments["compania"], data["hora"]);
+          }
+          return CircularProgressIndicator();
+        },
+      ),
       SingleChildScrollView(
         child: SizedBox(
             height: MediaQuery.of(context).size.height,
@@ -446,7 +450,7 @@ class _ClaseSemanaState extends State<ClaseSemana> {
                               style: const TextStyle(
                                 color: Colors.black,
                                 fontWeight: FontWeight.bold,
-                                fontFamily: "OpenSans",
+                                fontFamily: "Lato",
                               ),
                               underline: Container(
                                 width: Medidas.width(100),
@@ -496,7 +500,7 @@ class _ClaseSemanaState extends State<ClaseSemana> {
                               style: const TextStyle(
                                 color: Colors.black,
                                 fontWeight: FontWeight.bold,
-                                fontFamily: "OpenSans",
+                                fontFamily: "Lato",
                               ),
                               underline: Container(
                                 width: Medidas.width(100),
@@ -759,7 +763,7 @@ class _ClaseSemanaState extends State<ClaseSemana> {
             children: [
               Text(
                 'Clase de semana',
-                style: TextStyle(fontFamily: "OpenSans", fontWeight: FontWeight.bold, color: Colors.black),
+                style: TextStyle(fontFamily: "Lato", fontWeight: FontWeight.bold, color: Colors.black),
               ),
               label(widget.arguments["compania"], Colors.black, 10)
             ],
@@ -795,7 +799,7 @@ class _ClaseSemanaState extends State<ClaseSemana> {
   }
 }
 
-Widget Home(context, compania) {
+Widget Home(context, compania, hora) {
   DateTime selectedDate = new DateTime.now();
   String desdeString = new DateFormat("dd-MM-yyyy").format(selectedDate);
 
@@ -809,7 +813,7 @@ Widget Home(context, compania) {
         child: label("Lista de registros", Colors.black, 18),
       ),
       StreamBuilder(
-        stream: FirebaseFirestore.instance.collection("partes").where("compania", isEqualTo: compania).where("fechaRegistro", isEqualTo: desdeString).snapshots(),
+        stream: FirebaseFirestore.instance.collection("partes").where("compania", isEqualTo: compania).where("fechaRegistro", isEqualTo: desdeString).where("hora_registro", isEqualTo: hora).snapshots(),
         builder: (context, AsyncSnapshot<QuerySnapshot<Map<String, dynamic>>> snapshot) {
           if (!snapshot.hasData) {
             return CircularProgressIndicator();
@@ -877,7 +881,7 @@ Widget Home(context, compania) {
         },
       ),
       StreamBuilder(
-        stream: FirebaseFirestore.instance.collection("partes").where("compania", isEqualTo: compania).where("fechaRegistro", isEqualTo: desdeString).snapshots(),
+        stream: FirebaseFirestore.instance.collection("partes").where("compania", isEqualTo: compania).where("fechaRegistro", isEqualTo: desdeString).where("hora_registro", isEqualTo: hora).snapshots(),
         builder: (context, AsyncSnapshot<QuerySnapshot<Map<String, dynamic>>> snapshot) {
           if (!snapshot.hasData) {
             return CircularProgressIndicator();
@@ -944,7 +948,7 @@ Widget Home(context, compania) {
 Widget label(String text, Color color, double size) {
   return Text(
     text,
-    style: TextStyle(color: color, fontSize: size > 14 ? size : 14, fontFamily: "OpenSans", fontWeight: FontWeight.bold),
+    style: TextStyle(color: color, fontSize: size > 14 ? size : 14, fontFamily: "Lato", fontWeight: FontWeight.bold),
   );
 }
 
@@ -963,7 +967,7 @@ Widget textField({String? hintText, IconData? icono, bool obscureText = false, b
               ? true
               : false,
       onChanged: onChanged,
-      style: TextStyle(color: Colors.black, fontSize: 14, fontWeight: FontWeight.bold, fontFamily: "OpenSans", fontStyle: FontStyle.normal),
+      style: TextStyle(color: Colors.black, fontSize: 14, fontWeight: FontWeight.bold, fontFamily: "Lato", fontStyle: FontStyle.normal),
       textAlign: TextAlign.justify,
       decoration: InputDecoration(
           suffixIcon: pass == true

@@ -145,7 +145,7 @@ Widget label(String text, Color color, double size) {
   return Text(
     text,
     textAlign: TextAlign.center,
-    style: TextStyle(color: color, fontSize: size > 14 ? size : 14, fontFamily: "OpenSans", fontWeight: FontWeight.bold),
+    style: TextStyle(color: color, fontSize: size > 14 ? size : 14, fontFamily: "Lato", fontWeight: FontWeight.bold),
   );
 }
 

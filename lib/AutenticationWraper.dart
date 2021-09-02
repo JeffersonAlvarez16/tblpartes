@@ -17,14 +17,19 @@ class SwicthA extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Center(
-          child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          arguments["clase_semana"] == "clase_semana" ? ClaseSemanaW(context, arguments["compania"]) : Text(""),
-          arguments["comandante_compania"] == "comandante_compania" ? ComandanteCompaniaW(context, arguments["compania"]) : Text(""),
-        ],
-      )),
+      body: Container(
+          decoration: BoxDecoration(gradient: LinearGradient(colors: [Colors.red, Colors.pink], begin: Alignment.bottomCenter, end: Alignment.topCenter)),
+          child: Center(
+              child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              arguments["clase_semana"] == "clase_semana" ? ClaseSemanaW(context, arguments["compania"]) : Text(""),
+              arguments["comandante_compania"] == "comandante_compania" ? ComandanteCompaniaW(context, arguments["compania"]) : Text(""),
+              arguments["comandante"] == "comandante" ? ComandanteW(context, arguments["compania"]) : Text(""),
+              arguments["sub_comandante"] == "sub_comandante" ? SubComandanteCompaniaW(context, arguments["compania"]) : Text(""),
+              arguments["oficial_semana"] == "oficial_semana" ? OficialSemanaW(context, arguments["compania"]) : Text(""),
+            ],
+          ))),
     );
   }
 }
@@ -71,10 +76,73 @@ Widget ComandanteCompaniaW(context, compania) {
   );
 }
 
+Widget SubComandanteCompaniaW(context, compania) {
+  return Center(
+    child: GridView.count(
+      shrinkWrap: true,
+      primary: false,
+      padding: const EdgeInsets.all(20),
+      crossAxisSpacing: 10,
+      mainAxisSpacing: 10,
+      crossAxisCount: 2,
+      children: [
+        CardGrid("Ingresar como Sub Comandante", () {
+          Navigator.pushNamed(context, '/sub_comandante');
+        }),
+        CardGrid("Ingresar como Personal", () {
+          Navigator.pushNamed(context, '/personal');
+        }),
+      ],
+    ),
+  );
+}
+
+Widget OficialSemanaW(context, compania) {
+  return Center(
+    child: GridView.count(
+      shrinkWrap: true,
+      primary: false,
+      padding: const EdgeInsets.all(20),
+      crossAxisSpacing: 10,
+      mainAxisSpacing: 10,
+      crossAxisCount: 2,
+      children: [
+        CardGrid("Ingresar como Oficial de semana", () {
+          Navigator.pushNamed(context, '/oficial_semana');
+        }),
+        CardGrid("Ingresar como Personal", () {
+          Navigator.pushNamed(context, '/personal');
+        }),
+      ],
+    ),
+  );
+}
+
+Widget ComandanteW(context, compania) {
+  return Center(
+    child: GridView.count(
+      shrinkWrap: true,
+      primary: false,
+      padding: const EdgeInsets.all(20),
+      crossAxisSpacing: 10,
+      mainAxisSpacing: 10,
+      crossAxisCount: 2,
+      children: [
+        CardGrid("Ingresar como comandante", () {
+          Navigator.pushNamed(context, '/comandante');
+        }),
+        CardGrid("Ingresar como Personal", () {
+          Navigator.pushNamed(context, '/personal');
+        }),
+      ],
+    ),
+  );
+}
+
 Widget label(String text, Color color, double size) {
   return Text(
     text,
-    style: TextStyle(color: color, fontSize: size > 14 ? size : 14, fontFamily: "OpenSans", fontWeight: FontWeight.bold),
+    style: TextStyle(color: color, fontSize: size > 14 ? size : 14, fontFamily: "Lato", fontWeight: FontWeight.bold),
   );
 }
 

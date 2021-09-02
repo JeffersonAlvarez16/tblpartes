@@ -33,6 +33,7 @@ class _SignInState extends State<SignIn> {
     return Scaffold(
       backgroundColor: Color.fromRGBO(23, 23, 23, 1),
       body: Container(
+        decoration: BoxDecoration(borderRadius: BorderRadius.only(bottomLeft: Radius.circular(20), bottomRight: Radius.circular(20)), gradient: LinearGradient(colors: [Colors.black87, Colors.white54], begin: Alignment.bottomCenter, end: Alignment.topCenter)),
         child: SingleChildScrollView(
           child: Container(
             alignment: Alignment.center,
@@ -57,21 +58,21 @@ class _SignInState extends State<SignIn> {
                   margin: EdgeInsets.only(bottom: 8),
                   child: Text(
                     "Ejército Ecuatoriano",
-                    style: TextStyle(color: Colors.white, fontSize: 16, fontFamily: "OpenSans"),
+                    style: TextStyle(color: Colors.white, fontSize: 16, fontFamily: "Lato"),
                   ),
                 ),
                 Container(
                   margin: EdgeInsets.only(bottom: 8),
                   child: Text(
                     "Fuerza Terrestre",
-                    style: TextStyle(color: Colors.white, fontSize: 16, fontFamily: "OpenSans"),
+                    style: TextStyle(color: Colors.white, fontSize: 16, fontFamily: "Lato"),
                   ),
                 ),
                 Container(
                     margin: EdgeInsets.only(bottom: 8),
                     child: Text(
                       'Batallón de Selva 63 "Gualaquiza"',
-                      style: TextStyle(color: Colors.white, fontSize: 16, fontFamily: "OpenSans"),
+                      style: TextStyle(color: Colors.white, fontSize: 16, fontFamily: "Lato"),
                     )),
                 Expanded(
                   child: Container(),
@@ -136,13 +137,13 @@ class _SignInState extends State<SignIn> {
                                         ),
                                       )
                                     : Container(
-                                        width: Medidas.width(100),
                                         decoration: BoxDecoration(
-                                            color: Color.fromRGBO(218, 0, 55, 1),
                                             borderRadius: BorderRadius.only(
                                               topLeft: Radius.circular(20),
                                               bottomRight: Radius.circular(20),
-                                            )),
+                                            ),
+                                            gradient: LinearGradient(colors: [Colors.red, Colors.pink], begin: Alignment.bottomCenter, end: Alignment.topCenter)),
+                                        width: Medidas.width(100),
                                         child: TextButton(
                                           child: Text(
                                             "Ingresar",
@@ -228,7 +229,7 @@ Widget textField({String? hintText, IconData? icono, bool obscureText = false, b
               ? true
               : false,
       onChanged: onChanged,
-      style: TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.bold, fontFamily: "OpenSans", fontStyle: FontStyle.normal),
+      style: TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.bold, fontFamily: "Lato", fontStyle: FontStyle.normal),
       textAlign: TextAlign.justify,
       decoration: InputDecoration(
           suffixIcon: pass == true

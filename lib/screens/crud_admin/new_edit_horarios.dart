@@ -18,7 +18,9 @@ class NewEditHorarios extends StatefulWidget {
 class _NewEditHorariosState extends State<NewEditHorarios> {
   final DatabaseService databaseService = new DatabaseService();
   String hora = "";
+  String texto = "Inactivo";
   bool update = false;
+  bool estado = false;
   final _formKey = GlobalKey<FormState>();
   TimeOfDay selectedTime = TimeOfDay(hour: 00, minute: 00);
   late double _height;
@@ -54,9 +56,22 @@ class _NewEditHorariosState extends State<NewEditHorarios> {
     super.initState();
 
     if (widget.horario.uid.isNotEmpty) {
+      if (widget.horario.estado == true) {
+        setState(() {
+          texto = "Activo";
+        });
+      } else {
+        setState(() {
+          texto = "Inactivo";
+        });
+      }
+      _timeController.text = widget.horario.hora;
+      print(widget.horario.hora);
       setState(() {
         this.hora = widget.horario.hora;
         this.update = true;
+        _timeController.text = widget.horario.hora;
+        this.estado = widget.horario.estado;
       });
     }
   }
@@ -64,13 +79,21 @@ class _NewEditHorariosState extends State<NewEditHorarios> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      floatingActionButton: update == false ? ButonGuardar(_formKey, databaseService, context, this.hora) : ButonUpdate(_formKey, databaseService, context, hora, widget.horario.uid),
+      floatingActionButton: update == false
+          ? ButonGuardar(_formKey, databaseService, context, this.hora, this.estado)
+          : ButonUpdate(
+              _formKey,
+              databaseService,
+              context,
+              hora,
+              widget.horario.uid,
+            ),
       appBar: AppBar(
         iconTheme: IconThemeData(color: Colors.black),
         backgroundColor: Color.fromRGBO(237, 237, 237, 1),
         title: Text(
           "Datos de los horarios",
-          style: TextStyle(color: Colors.black, fontFamily: "OpenSans", fontWeight: FontWeight.bold),
+          style: TextStyle(color: Colors.black, fontFamily: "Lato", fontWeight: FontWeight.bold),
         ),
       ),
       body: SingleChildScrollView(
@@ -91,15 +114,15 @@ class _NewEditHorariosState extends State<NewEditHorarios> {
                   decoration: BoxDecoration(color: Colors.black12),
                   child: TextFormField(
                     validator: (value) => value!.isEmpty || value == null ? "Ingrese un horario" : null,
-                    style: TextStyle(color: Colors.black, fontSize: 40, fontWeight: FontWeight.bold, fontFamily: "OpenSans", fontStyle: FontStyle.normal),
+                    style: TextStyle(color: Colors.black, fontSize: 40, fontWeight: FontWeight.bold, fontFamily: "Lato", fontStyle: FontStyle.normal),
                     textAlign: TextAlign.center,
                     enabled: false,
                     keyboardType: TextInputType.text,
                     controller: _timeController,
                     decoration: InputDecoration(
                         labelText: "Seleccionar el horario",
-                        hintStyle: TextStyle(fontWeight: FontWeight.w400, color: Colors.black, fontFamily: "OpenSans"),
-                        labelStyle: TextStyle(fontWeight: FontWeight.w600, color: Colors.black, fontSize: 14, fontFamily: "OpenSans"),
+                        hintStyle: TextStyle(fontWeight: FontWeight.w400, color: Colors.black, fontFamily: "Lato"),
+                        labelStyle: TextStyle(fontWeight: FontWeight.w600, color: Colors.black, fontSize: 14, fontFamily: "Lato"),
                         disabledBorder: UnderlineInputBorder(borderSide: BorderSide.none),
                         // labelText: 'Time',
                         contentPadding: EdgeInsets.all(5)),
@@ -114,11 +137,11 @@ class _NewEditHorariosState extends State<NewEditHorarios> {
   }
 }
 
-Widget ButonGuardar(_formKey, databaseService, context, hora) {
+Widget ButonGuardar(_formKey, databaseService, context, hora, estado) {
   return TextButton(
       child: Text(
         "Guardar Datos",
-        style: TextStyle(color: Colors.white, fontFamily: "OpenSans", fontSize: 14),
+        style: TextStyle(color: Colors.white, fontFamily: "Lato", fontSize: 14),
       ),
       style: ButtonStyle(backgroundColor: MaterialStateProperty.all(Color.fromRGBO(218, 0, 55, 1))),
       onPressed: () async {
@@ -128,7 +151,8 @@ Widget ButonGuardar(_formKey, databaseService, context, hora) {
         final Map<String, dynamic> data = Map<String, dynamic>();
         data["hora"] = hora;
         data["uid"] = uid;
-        data["createAt"] = date;
+        data["estado"] = false;
+        data["createAt"] = estado;
 
         if (hora.toString().isNotEmpty) {
           int res = await validateExistencia(databaseService, hora);
@@ -146,20 +170,34 @@ Widget ButonGuardar(_formKey, databaseService, context, hora) {
       });
 }
 
-Widget ButonUpdate(_formKey, databaseService, context, nombre, uid) {
+Widget ButonUpdate(_formKey, databaseService, context, hora, id) {
   return TextButton(
       child: Text(
         "Actualizar Datos",
-        style: TextStyle(color: Colors.white, fontFamily: "OpenSans", fontSize: 14),
+        style: TextStyle(color: Colors.white, fontFamily: "Lato", fontSize: 14),
       ),
       style: ButtonStyle(backgroundColor: MaterialStateProperty.all(Color.fromRGBO(218, 0, 55, 1))),
       onPressed: () async {
+        DateTime now = new DateTime.now();
+        DateTime date = new DateTime(now.year, now.month, now.day);
+
         final Map<String, dynamic> data = Map<String, dynamic>();
-        data["nombre"] = nombre;
-        data["uid"] = uid;
-        if (_formKey.currentState!.validate()) {
-          await databaseService.updateBatallon(uid, data);
-          Navigator.pop(context);
+        data["hora"] = hora;
+        data["uid"] = id;
+        data["estado"] = false;
+
+        if (hora.toString().isNotEmpty) {
+          int res = await validateExistencia(databaseService, hora);
+          if (res == 1) {
+            final snackBar = SnackBar(content: Text('Ya existe un horario con esta hora registrado'));
+            ScaffoldMessenger.of(context).showSnackBar(snackBar);
+          } else {
+            await databaseService.updateHoraroios(id, data);
+            Navigator.pop(context);
+          }
+        } else {
+          final snackBar = SnackBar(content: Text('Debe seleecionar un horario'));
+          ScaffoldMessenger.of(context).showSnackBar(snackBar);
         }
       });
 }
@@ -181,7 +219,7 @@ Widget textField({String? hintText, IconData? icono, String? valor, bool obscure
       keyboardType: textInputTipe,
       obscureText: obscureText,
       onChanged: onChanged,
-      style: TextStyle(color: Colors.black, fontSize: 14, fontWeight: FontWeight.bold, fontFamily: "OpenSans", fontStyle: FontStyle.normal),
+      style: TextStyle(color: Colors.black, fontSize: 14, fontWeight: FontWeight.bold, fontFamily: "Lato", fontStyle: FontStyle.normal),
       textAlign: TextAlign.justify,
       decoration: InputDecoration(
         labelText: hintText,
@@ -193,8 +231,8 @@ Widget textField({String? hintText, IconData? icono, String? valor, bool obscure
         ),
         contentPadding: EdgeInsets.all(8),
         hintText: hintText,
-        labelStyle: TextStyle(fontWeight: FontWeight.w600, color: Colors.black, fontFamily: "OpenSans"),
-        hintStyle: TextStyle(fontWeight: FontWeight.w400, color: Colors.black, fontFamily: "OpenSans"),
+        labelStyle: TextStyle(fontWeight: FontWeight.w600, color: Colors.black, fontFamily: "Lato"),
+        hintStyle: TextStyle(fontWeight: FontWeight.w400, color: Colors.black, fontFamily: "Lato"),
       ),
     ),
   );

@@ -32,45 +32,47 @@ class _NewEditBatallonState extends State<NewEditBatallon> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      floatingActionButton: update == false
-          ? ButonGuardar(_formKey, databaseService, context, this.nombre)
-          : ButonUpdate(
-              _formKey, databaseService, context, nombre, widget.batallon.uid),
+      floatingActionButton: update == false ? ButonGuardar(_formKey, databaseService, context, this.nombre) : ButonUpdate(_formKey, databaseService, context, nombre, widget.batallon.uid),
       appBar: AppBar(
-        iconTheme: IconThemeData(color: Colors.black),
-        backgroundColor: Color.fromRGBO(237, 237, 237, 1),
+        brightness: Brightness.dark,
+        backgroundColor: Colors.black12,
+        elevation: 0.0,
+        toolbarHeight: 70,
+        flexibleSpace: Container(
+          decoration: BoxDecoration(borderRadius: BorderRadius.only(bottomLeft: Radius.circular(20), bottomRight: Radius.circular(20)), gradient: LinearGradient(colors: [Colors.red, Colors.pink], begin: Alignment.bottomCenter, end: Alignment.topCenter)),
+        ),
         title: Text(
           "Datos del Batallón",
-          style: TextStyle(
-              color: Colors.black,
-              fontFamily: "OpenSans",
-              fontWeight: FontWeight.bold),
+          style: TextStyle(color: Colors.white, fontFamily: "Lato", fontWeight: FontWeight.bold),
         ),
       ),
-      body: SingleChildScrollView(
-          child: Form(
-        key: _formKey,
-        autovalidateMode: AutovalidateMode.onUserInteraction,
-        child: Container(
-          padding: EdgeInsets.all(12),
-          child: Column(
-            children: [
-              textField(
-                  hintText: 'Nombre',
-                  icono: Icons.lock_open_outlined,
-                  obscureText: false,
-                  valor: nombre,
-                  validator: (value) =>
-                      value.isEmpty ? "Ingrese el nombre del batallón" : null,
-                  onChanged: (value) {
-                    setState(() {
-                      nombre = value;
-                    });
-                  }),
-            ],
-          ),
-        ),
-      )),
+      body: Container(
+          height: MediaQuery.of(context).size.height,
+          width: MediaQuery.of(context).size.width,
+          color: Colors.black12,
+          child: SingleChildScrollView(
+              child: Form(
+            key: _formKey,
+            autovalidateMode: AutovalidateMode.onUserInteraction,
+            child: Container(
+              padding: EdgeInsets.all(12),
+              child: Column(
+                children: [
+                  textField(
+                      hintText: 'Nombre',
+                      icono: Icons.lock_open_outlined,
+                      obscureText: false,
+                      valor: nombre,
+                      validator: (value) => value.isEmpty ? "Ingrese el nombre del batallón" : null,
+                      onChanged: (value) {
+                        setState(() {
+                          nombre = value;
+                        });
+                      }),
+                ],
+              ),
+            ),
+          ))),
     );
   }
 }
@@ -79,12 +81,9 @@ Widget ButonGuardar(_formKey, databaseService, context, nombre) {
   return TextButton(
       child: Text(
         "Guardar Datos",
-        style: TextStyle(
-            color: Colors.white, fontFamily: "OpenSans", fontSize: 14),
+        style: TextStyle(color: Colors.white, fontFamily: "Lato", fontSize: 14),
       ),
-      style: ButtonStyle(
-          backgroundColor:
-              MaterialStateProperty.all(Color.fromRGBO(218, 0, 55, 1))),
+      style: ButtonStyle(backgroundColor: MaterialStateProperty.all(Color.fromRGBO(218, 0, 55, 1))),
       onPressed: () async {
         var uid = Uuid().v4();
         final Map<String, dynamic> data = Map<String, dynamic>();
@@ -101,12 +100,9 @@ Widget ButonUpdate(_formKey, databaseService, context, nombre, uid) {
   return TextButton(
       child: Text(
         "Actualizar Datos",
-        style: TextStyle(
-            color: Colors.white, fontFamily: "OpenSans", fontSize: 14),
+        style: TextStyle(color: Colors.white, fontFamily: "Lato", fontSize: 14),
       ),
-      style: ButtonStyle(
-          backgroundColor:
-              MaterialStateProperty.all(Color.fromRGBO(218, 0, 55, 1))),
+      style: ButtonStyle(backgroundColor: MaterialStateProperty.all(Color.fromRGBO(218, 0, 55, 1))),
       onPressed: () async {
         final Map<String, dynamic> data = Map<String, dynamic>();
         data["nombre"] = nombre;
@@ -118,14 +114,7 @@ Widget ButonUpdate(_formKey, databaseService, context, nombre, uid) {
       });
 }
 
-Widget textField(
-    {String? hintText,
-    IconData? icono,
-    String? valor,
-    bool obscureText = false,
-    Function(String)? onChanged,
-    dynamic validator,
-    TextInputType textInputTipe = TextInputType.text}) {
+Widget textField({String? hintText, IconData? icono, String? valor, bool obscureText = false, Function(String)? onChanged, dynamic validator, TextInputType textInputTipe = TextInputType.text}) {
   return Container(
     decoration: BoxDecoration(
       color: Colors.black12,
@@ -136,12 +125,7 @@ Widget textField(
       keyboardType: textInputTipe,
       obscureText: obscureText,
       onChanged: onChanged,
-      style: TextStyle(
-          color: Colors.black,
-          fontSize: 14,
-          fontWeight: FontWeight.bold,
-          fontFamily: "OpenSans",
-          fontStyle: FontStyle.normal),
+      style: TextStyle(color: Colors.black, fontSize: 14, fontWeight: FontWeight.bold, fontFamily: "Lato", fontStyle: FontStyle.normal),
       textAlign: TextAlign.justify,
       decoration: InputDecoration(
         enabledBorder: UnderlineInputBorder(
@@ -152,10 +136,7 @@ Widget textField(
         ),
         contentPadding: EdgeInsets.all(8),
         hintText: hintText,
-        hintStyle: TextStyle(
-            fontWeight: FontWeight.w400,
-            color: Colors.black,
-            fontFamily: "OpenSans"),
+        hintStyle: TextStyle(fontWeight: FontWeight.w400, color: Colors.black, fontFamily: "Lato"),
       ),
     ),
   );

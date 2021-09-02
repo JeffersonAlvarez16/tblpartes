@@ -175,10 +175,10 @@ class _SubComandanteState extends State<SubComandante> {
     print("valor total:" + listaTotal.length.toString());
     print("valor ind" + lista.length.toString());
     for (var i = 0; i < listaTotal.length; i++) {
-      if (i <= 17) {
+      if (i <= 15) {
         listaNueva.add(listaTotal[i]);
       } else {
-        if (i == 18) {
+        if (i == 16) {
           listaARR.add(listaNueva);
           listaNueva = [];
           listaNueva.add(listaTotal[i]);
@@ -338,7 +338,19 @@ class _SubComandanteState extends State<SubComandante> {
   @override
   Widget build(BuildContext context) {
     List<Widget> _widgetOptions = <Widget>[
-      Home(context, 'widget.arguments["compania"]'),
+      StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
+        stream: FirebaseFirestore.instance.collection("horarios").where("estado", isEqualTo: true).snapshots(),
+        builder: (context, AsyncSnapshot<QuerySnapshot<Map<String, dynamic>>> snapshot) {
+          if (!snapshot.hasData) {
+            return CircularProgressIndicator();
+          }
+          if (snapshot.hasData && snapshot.connectionState == ConnectionState.active) {
+            Map<String, dynamic> data = snapshot.data!.docs[0].data();
+            return Home(context, 'widget.arguments["compania"]', data["hora"]);
+          }
+          return CircularProgressIndicator();
+        },
+      ),
       SingleChildScrollView(
           child: Column(mainAxisAlignment: MainAxisAlignment.start, mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.start, children: [
         Container(
@@ -410,61 +422,6 @@ class _SubComandanteState extends State<SubComandante> {
             mainAxisAlignment: MainAxisAlignment.start,
             children: [
               SizedBox(
-                height: 16,
-              ),
-              Container(
-                margin: EdgeInsets.only(left: 24, right: 24),
-                child: Text("Seleccione la compañia"),
-              ),
-              StreamBuilder<List<String>>(
-                stream: streamServices.companiaStringString,
-                builder: (context, AsyncSnapshot<List<String>> snapshot) {
-                  if (!snapshot.hasData) {
-                    return CircularProgressIndicator();
-                  }
-                  if (snapshot.connectionState == ConnectionState.active && snapshot.hasData) {
-                    List<String>? lisTem = snapshot.data;
-                    lisTem!.add("Todos");
-                    return Container(
-                      alignment: Alignment.center,
-                      color: Colors.black12,
-                      margin: EdgeInsets.only(left: 24, right: 24),
-                      child: DropdownButton(
-                        isExpanded: true,
-                        value: companiaselect,
-                        iconSize: 24,
-                        elevation: 16,
-                        style: const TextStyle(
-                          color: Colors.black,
-                          fontWeight: FontWeight.bold,
-                          fontFamily: "OpenSans",
-                        ),
-                        underline: Container(
-                          width: Medidas.width(100),
-                          height: 1,
-                          color: Color.fromRGBO(23, 23, 23, 1),
-                        ),
-                        onChanged: (dynamic? newValue) {
-                          DateTime selectedDate = new DateTime.now();
-                          String desdeStrings = new DateFormat("dd-MM-yyyy").format(selectedDate);
-                          setState(() {
-                            companiaselect = newValue;
-                            urlSeacrh = FirebaseFirestore.instance.collection("partes").where("fechaRegistro", isEqualTo: desdeStrings).where("compania", isEqualTo: newValue).snapshots();
-                          });
-                        },
-                        items: lisTem.map<DropdownMenuItem>((String value) {
-                          return DropdownMenuItem(
-                            value: value,
-                            child: Text(value),
-                          );
-                        }).toList(),
-                      ),
-                    );
-                  }
-                  return Text("");
-                },
-              ),
-              SizedBox(
                 height: 24,
               ),
               Container(
@@ -492,7 +449,7 @@ class _SubComandanteState extends State<SubComandante> {
                         style: const TextStyle(
                           color: Colors.black,
                           fontWeight: FontWeight.bold,
-                          fontFamily: "OpenSans",
+                          fontFamily: "Lato",
                         ),
                         underline: Container(
                           width: Medidas.width(100),
@@ -500,12 +457,59 @@ class _SubComandanteState extends State<SubComandante> {
                           color: Color.fromRGBO(23, 23, 23, 1),
                         ),
                         onChanged: (dynamic? newValue) {
-                          DateTime selectedDate = new DateTime.now();
-                          String desdeStrings = new DateFormat("dd-MM-yyyy").format(selectedDate);
-                          setState(() {
-                            horaParte = newValue;
-                            urlSeacrh = FirebaseFirestore.instance.collection("partes").where("hora_registro", isEqualTo: newValue).where("fechaRegistro", isEqualTo: desdeStrings).where("compania", isEqualTo: companiaselect).snapshots();
-                          });
+                          if (newValue == "Todos" && estadoParte == "Todos" && companiaselect == "Todos") {
+                            setState(() {
+                              horaParte = newValue;
+                              urlSeacrh = FirebaseFirestore.instance.collection("partes").where("fechaRegistro", isEqualTo: desdeString).snapshots();
+                            });
+                            return;
+                          }
+                          if (newValue == "Todos" && estadoParte == "Todos") {
+                            setState(() {
+                              horaParte = newValue;
+                              urlSeacrh = FirebaseFirestore.instance.collection("partes").where("fechaRegistro", isEqualTo: desdeString).where("compania", isEqualTo: companiaselect).snapshots();
+                            });
+                            return;
+                          }
+                          if (companiaselect == "Todos" && estadoParte == "Todos") {
+                            setState(() {
+                              horaParte = newValue;
+                              urlSeacrh = FirebaseFirestore.instance.collection("partes").where("fechaRegistro", isEqualTo: desdeString).where("hora_registro", isEqualTo: newValue).snapshots();
+                            });
+                            return;
+                          }
+                          if (newValue == "Todos" && companiaselect == "Todos") {
+                            setState(() {
+                              horaParte = newValue;
+                              urlSeacrh = FirebaseFirestore.instance.collection("partes").where("fechaRegistro", isEqualTo: desdeString).where("estado", isEqualTo: estadoParte).snapshots();
+                            });
+                            return;
+                          }
+                          if (companiaselect == "Todos") {
+                            setState(() {
+                              horaParte = newValue;
+                              urlSeacrh = FirebaseFirestore.instance.collection("partes").where("fechaRegistro", isEqualTo: desdeString).where("estado", isEqualTo: estadoParte).where("hora_registro", isEqualTo: newValue).snapshots();
+                            });
+                            return;
+                          }
+                          if (estadoParte == "Todos") {
+                            setState(() {
+                              horaParte = newValue;
+                              urlSeacrh = FirebaseFirestore.instance.collection("partes").where("hora_registro", isEqualTo: newValue).where("fechaRegistro", isEqualTo: desdeString).where("compania", isEqualTo: companiaselect).snapshots();
+                            });
+                            return;
+                          }
+                          if (newValue == "Todos" && estadoParte != "Todos" && companiaselect != "Todos") {
+                            setState(() {
+                              horaParte = newValue;
+                              urlSeacrh = FirebaseFirestore.instance.collection("partes").where("fechaRegistro", isEqualTo: desdeString).where("compania", isEqualTo: companiaselect).where("estado", isEqualTo: estadoParte).snapshots();
+                            });
+                          } else {
+                            setState(() {
+                              horaParte = newValue;
+                              urlSeacrh = FirebaseFirestore.instance.collection("partes").where("hora_registro", isEqualTo: newValue).where("fechaRegistro", isEqualTo: desdeString).where("compania", isEqualTo: companiaselect).where("estado", isEqualTo: estadoParte).snapshots();
+                            });
+                          }
                         },
                         items: lisTem.map<DropdownMenuItem>((String value) {
                           return DropdownMenuItem(
@@ -547,7 +551,7 @@ class _SubComandanteState extends State<SubComandante> {
                         style: const TextStyle(
                           color: Colors.black,
                           fontWeight: FontWeight.bold,
-                          fontFamily: "OpenSans",
+                          fontFamily: "Lato",
                         ),
                         underline: Container(
                           width: Medidas.width(100),
@@ -555,12 +559,174 @@ class _SubComandanteState extends State<SubComandante> {
                           color: Color.fromRGBO(23, 23, 23, 1),
                         ),
                         onChanged: (dynamic? newValue) {
-                          DateTime selectedDate = new DateTime.now();
-                          String desdeStrings = new DateFormat("dd-MM-yyyy").format(selectedDate);
-                          setState(() {
-                            estadoParte = newValue;
-                            urlSeacrh = FirebaseFirestore.instance.collection("partes").where("estado", isEqualTo: newValue).where("hora_registro", isEqualTo: horaParte).where("fechaRegistro", isEqualTo: desdeStrings).where("compania", isEqualTo: companiaselect).snapshots();
-                          });
+                          if (newValue == "Todos" && horaParte == "Todos" && companiaselect == "Todos") {
+                            setState(() {
+                              estadoParte = newValue;
+                              urlSeacrh = FirebaseFirestore.instance.collection("partes").where("fechaRegistro", isEqualTo: desdeString).snapshots();
+                            });
+                            return;
+                          }
+                          if (newValue == "Todos" && horaParte == "Todos") {
+                            setState(() {
+                              estadoParte = newValue;
+                              urlSeacrh = FirebaseFirestore.instance.collection("partes").where("fechaRegistro", isEqualTo: desdeString).where("compania", isEqualTo: companiaselect).snapshots();
+                            });
+                            return;
+                          }
+                          if (companiaselect == "Todos" && horaParte == "Todos") {
+                            setState(() {
+                              estadoParte = newValue;
+                              urlSeacrh = FirebaseFirestore.instance.collection("partes").where("fechaRegistro", isEqualTo: desdeString).where("estado", isEqualTo: newValue).snapshots();
+                            });
+                            return;
+                          }
+                          if (newValue == "Todos" && companiaselect == "Todos") {
+                            print("entro busqueda");
+                            print(newValue);
+                            print(companiaselect);
+                            print(horaParte);
+
+                            setState(() {
+                              estadoParte = newValue;
+                              urlSeacrh = FirebaseFirestore.instance.collection("partes").where("fechaRegistro", isEqualTo: desdeString).where("hora_registro", isEqualTo: horaParte).snapshots();
+                            });
+                            return;
+                          }
+                          if (companiaselect == "Todos") {
+                            setState(() {
+                              estadoParte = newValue;
+                              urlSeacrh = FirebaseFirestore.instance.collection("partes").where("fechaRegistro", isEqualTo: desdeString).where("estado", isEqualTo: newValue).where("hora_registro", isEqualTo: horaParte).snapshots();
+                            });
+                            return;
+                          }
+                          if (horaParte == "Todos") {
+                            setState(() {
+                              estadoParte = newValue;
+                              urlSeacrh = FirebaseFirestore.instance.collection("partes").where("estado", isEqualTo: newValue).where("fechaRegistro", isEqualTo: desdeString).where("compania", isEqualTo: companiaselect).snapshots();
+                            });
+                            return;
+                          }
+                          if (newValue == "Todos" && horaParte != "Todos" && companiaselect != "Todos") {
+                            setState(() {
+                              estadoParte = newValue;
+                              urlSeacrh = FirebaseFirestore.instance.collection("partes").where("fechaRegistro", isEqualTo: desdeString).where("compania", isEqualTo: companiaselect).where("hora_registro", isEqualTo: horaParte).snapshots();
+                            });
+                          } else {
+                            setState(() {
+                              estadoParte = newValue;
+                              urlSeacrh = FirebaseFirestore.instance.collection("partes").where("estado", isEqualTo: newValue).where("hora_registro", isEqualTo: horaParte).where("fechaRegistro", isEqualTo: desdeString).where("compania", isEqualTo: companiaselect).snapshots();
+                            });
+                          }
+                        },
+                        items: lisTem.map<DropdownMenuItem>((String value) {
+                          return DropdownMenuItem(
+                            value: value,
+                            child: Text(value),
+                          );
+                        }).toList(),
+                      ),
+                    );
+                  }
+                  return Text("");
+                },
+              ),
+              SizedBox(
+                height: 16,
+              ),
+              Container(
+                margin: EdgeInsets.only(left: 24, right: 24),
+                child: Text("Seleccione la compañia"),
+              ),
+              StreamBuilder<List<String>>(
+                stream: streamServices.companiaStringString,
+                builder: (context, AsyncSnapshot<List<String>> snapshot) {
+                  if (!snapshot.hasData) {
+                    return CircularProgressIndicator();
+                  }
+                  if (snapshot.connectionState == ConnectionState.active && snapshot.hasData) {
+                    List<String>? lisTem = snapshot.data;
+                    lisTem!.add("Todos");
+                    return Container(
+                      alignment: Alignment.center,
+                      color: Colors.black12,
+                      margin: EdgeInsets.only(left: 24, right: 24),
+                      child: DropdownButton(
+                        isExpanded: true,
+                        value: companiaselect,
+                        iconSize: 24,
+                        elevation: 16,
+                        style: const TextStyle(
+                          color: Colors.black,
+                          fontWeight: FontWeight.bold,
+                          fontFamily: "Lato",
+                        ),
+                        underline: Container(
+                          width: Medidas.width(100),
+                          height: 1,
+                          color: Color.fromRGBO(23, 23, 23, 1),
+                        ),
+                        onChanged: (dynamic? newValue) {
+                          if (newValue == "Todos" && horaParte == "Todos" && estadoParte == "Todos") {
+                            setState(() {
+                              companiaselect = newValue;
+                              urlSeacrh = FirebaseFirestore.instance.collection("partes").where("fechaRegistro", isEqualTo: desdeString).snapshots();
+                            });
+                            return;
+                          }
+                          if (newValue == "Todos" && horaParte == "Todos") {
+                            setState(() {
+                              companiaselect = newValue;
+                              urlSeacrh = FirebaseFirestore.instance.collection("partes").where("fechaRegistro", isEqualTo: desdeString).where("estado", isEqualTo: estadoParte).snapshots();
+                            });
+                            return;
+                          }
+                          if (newValue == "Todos" && estadoParte == "Todos") {
+                            setState(() {
+                              companiaselect = newValue;
+                              urlSeacrh = FirebaseFirestore.instance.collection("partes").where("fechaRegistro", isEqualTo: desdeString).where("hora_registro", isEqualTo: horaParte).snapshots();
+                            });
+                            return;
+                          }
+                          if (horaParte == "Todos" && estadoParte == "Todos") {
+                            setState(() {
+                              companiaselect = newValue;
+                              urlSeacrh = FirebaseFirestore.instance.collection("partes").where("fechaRegistro", isEqualTo: desdeString).where("compania", isEqualTo: newValue).snapshots();
+                            });
+                            return;
+                          }
+
+                          if (horaParte == "Todos") {
+                            setState(() {
+                              companiaselect = newValue;
+                              urlSeacrh = FirebaseFirestore.instance.collection("partes").where("estado", isEqualTo: estadoParte).where("fechaRegistro", isEqualTo: desdeString).where("compania", isEqualTo: newValue).snapshots();
+                            });
+                            return;
+                          }
+                          if (estadoParte == "Todos") {
+                            setState(() {
+                              companiaselect = newValue;
+                              urlSeacrh = FirebaseFirestore.instance.collection("partes").where("hora_registro", isEqualTo: horaParte).where("fechaRegistro", isEqualTo: desdeString).where("compania", isEqualTo: newValue).snapshots();
+                            });
+                            return;
+                          }
+                          if (newValue == "Todos") {
+                            setState(() {
+                              companiaselect = newValue;
+                              urlSeacrh = FirebaseFirestore.instance.collection("partes").where("fechaRegistro", isEqualTo: desdeString).where("estado", isEqualTo: estadoParte).where("hora_registro", isEqualTo: horaParte).snapshots();
+                            });
+                            return;
+                          }
+                          if (newValue == "Todos") {
+                            setState(() {
+                              companiaselect = newValue;
+                              urlSeacrh = FirebaseFirestore.instance.collection("partes").where("fechaRegistro", isEqualTo: desdeString).where("estado", isEqualTo: estadoParte).where("hora_registro", isEqualTo: horaParte).snapshots();
+                            });
+                          } else {
+                            setState(() {
+                              companiaselect = newValue;
+                              urlSeacrh = FirebaseFirestore.instance.collection("partes").where("estado", isEqualTo: estadoParte).where("hora_registro", isEqualTo: horaParte).where("fechaRegistro", isEqualTo: desdeString).where("compania", isEqualTo: newValue).snapshots();
+                            });
+                          }
                         },
                         items: lisTem.map<DropdownMenuItem>((String value) {
                           return DropdownMenuItem(
@@ -830,7 +996,7 @@ class _SubComandanteState extends State<SubComandante> {
             children: [
               Text(
                 'Sub comandante',
-                style: TextStyle(fontFamily: "OpenSans", fontWeight: FontWeight.bold, color: Colors.black),
+                style: TextStyle(fontFamily: "Lato", fontWeight: FontWeight.bold, color: Colors.black),
               ),
             ],
           ),
@@ -865,14 +1031,55 @@ class _SubComandanteState extends State<SubComandante> {
   }
 }
 
-Widget Home(context, compania) {
+Stream<QuerySnapshot<Map<String, dynamic>>> devolverConsulta() {
+  DateTime selectedDate = new DateTime.now();
+  String desdeString = new DateFormat("dd-MM-yyyy").format(selectedDate);
+  String currentTime = DateFormat.jm().format(DateTime.now());
+
+  /* 02:30 PM
+  09:00 AM
+  06:30 AM
+  05:00 PM */
+
+  String tipo = currentTime.contains("PM") ? "PM" : "AM";
+  if (tipo == "PM") {
+    double hora = double.parse(currentTime.substring(0, 1)) + 12;
+
+    double minutos = double.parse("0." + currentTime.substring((currentTime.length - 5), (currentTime.length - 3)));
+
+    double horaTotal = hora + minutos;
+    if (horaTotal >= 14.30 && horaTotal <= 6.30) {
+      return FirebaseFirestore.instance.collection("partes").where("fechaRegistro", isEqualTo: desdeString).where("hora_registro", isEqualTo: "05:00 PM").snapshots();
+    }
+    if (horaTotal > 6.30 && horaTotal < 9.0) {
+      return FirebaseFirestore.instance.collection("partes").where("fechaRegistro", isEqualTo: desdeString).where("hora_registro", isEqualTo: "06:30 AM").snapshots();
+    }
+    if (horaTotal > 9.0 && horaTotal < 2.30) {
+      return FirebaseFirestore.instance.collection("partes").where("fechaRegistro", isEqualTo: desdeString).where("hora_registro", isEqualTo: "02:30 PM").snapshots();
+    }
+  } else {
+    double hora = double.parse(currentTime.substring(0, 2));
+
+    double minutos = double.parse("0." + currentTime.substring((currentTime.length - 5), (currentTime.length - 3)));
+
+    double horaTotal = hora + minutos;
+    if (horaTotal > 6.30 && horaTotal < 9.0) {
+      return FirebaseFirestore.instance.collection("partes").where("fechaRegistro", isEqualTo: desdeString).where("hora_registro", isEqualTo: "06:30 AM").snapshots();
+    }
+
+    if (horaTotal > 9.0 && horaTotal < 14.30) {
+      return FirebaseFirestore.instance.collection("partes").where("fechaRegistro", isEqualTo: desdeString).where("hora_registro", isEqualTo: "09:00 AM").snapshots();
+    }
+  }
+  Stream<QuerySnapshot<Map<String, dynamic>>> busqueda = FirebaseFirestore.instance.collection("partes").where("fechaRegistro", isEqualTo: desdeString).snapshots();
+  return busqueda;
+}
+
+Widget Home(context, compania, hora) {
   DateTime selectedDate = new DateTime.now();
   String desdeString = new DateFormat("dd-MM-yyyy").format(selectedDate);
 
   return SingleChildScrollView(
-      child: SizedBox(
-    height: MediaQuery.of(context).size.height,
-    width: MediaQuery.of(context).size.width,
     child: Column(crossAxisAlignment: CrossAxisAlignment.start, mainAxisAlignment: MainAxisAlignment.start, children: [
       SizedBox(
         height: 12,
@@ -882,7 +1089,7 @@ Widget Home(context, compania) {
         child: label("Lista de registros", Colors.black, 18),
       ),
       StreamBuilder(
-        stream: FirebaseFirestore.instance.collection("partes").where("fechaRegistro", isEqualTo: desdeString).snapshots(),
+        stream: FirebaseFirestore.instance.collection("partes").where("fechaRegistro", isEqualTo: desdeString).where("hora_registro", isEqualTo: hora).snapshots(),
         builder: (context, AsyncSnapshot<QuerySnapshot<Map<String, dynamic>>> snapshot) {
           if (!snapshot.hasData) {
             return CircularProgressIndicator();
@@ -950,7 +1157,7 @@ Widget Home(context, compania) {
         },
       ),
       StreamBuilder(
-        stream: FirebaseFirestore.instance.collection("partes").where("fechaRegistro", isEqualTo: desdeString).snapshots(),
+        stream: FirebaseFirestore.instance.collection("partes").where("fechaRegistro", isEqualTo: desdeString).where("hora_registro", isEqualTo: hora).snapshots(),
         builder: (context, AsyncSnapshot<QuerySnapshot<Map<String, dynamic>>> snapshot) {
           if (!snapshot.hasData) {
             return CircularProgressIndicator();
@@ -1011,7 +1218,7 @@ Widget Home(context, compania) {
         },
       ),
     ]),
-  ));
+  );
 }
 
 Widget Notificaciones(context, databaseService) {
@@ -1150,7 +1357,7 @@ Future<void> main() async {}
 Widget label(String text, Color color, double size) {
   return Text(
     text,
-    style: TextStyle(color: color, fontSize: size > 14 ? size : 14, fontFamily: "OpenSans", fontWeight: FontWeight.bold),
+    style: TextStyle(color: color, fontSize: size > 14 ? size : 14, fontFamily: "Lato", fontWeight: FontWeight.bold),
   );
 }
 
@@ -1169,7 +1376,7 @@ Widget textField({String? hintText, IconData? icono, bool obscureText = false, b
               ? true
               : false,
       onChanged: onChanged,
-      style: TextStyle(color: Colors.black, fontSize: 14, fontWeight: FontWeight.bold, fontFamily: "OpenSans", fontStyle: FontStyle.normal),
+      style: TextStyle(color: Colors.black, fontSize: 14, fontWeight: FontWeight.bold, fontFamily: "Lato", fontStyle: FontStyle.normal),
       textAlign: TextAlign.justify,
       decoration: InputDecoration(
           suffixIcon: pass == true

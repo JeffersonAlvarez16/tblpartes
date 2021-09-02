@@ -31,7 +31,7 @@ class _AdminPersonalState extends State<AdminPersonal> {
             child: TextButton(
                 child: Text(
                   "Registrar Personal",
-                  style: TextStyle(color: Colors.white, fontFamily: "OpenSans", fontSize: 14),
+                  style: TextStyle(color: Colors.white, fontFamily: "Lato", fontSize: 14),
                 ),
                 style: ButtonStyle(backgroundColor: MaterialStateProperty.all(Color.fromRGBO(218, 0, 55, 1))),
                 onPressed: () {
@@ -39,7 +39,7 @@ class _AdminPersonalState extends State<AdminPersonal> {
                     context,
                     MaterialPageRoute(builder: (context) {
                       return NewEditPersonal(
-                        userModel: new UserModel.fromUserModel(uid: "", grado: "", apellidos: "", nombres: "", batallon: "", compania: "", token: "", email: "", cedula: "", typeUser: ""),
+                        userModel: new UserModel.fromUserModel(uid: "", hasta: "", grado: "", apellidos: "", nombres: "", batallon: "", compania: "", token: "", email: "", cedula: "", typeUser: ""),
                       );
                     }),
                   );
@@ -69,7 +69,7 @@ class _AdminPersonalState extends State<AdminPersonal> {
             ],
             title: Text(
               "Gestión de Personal",
-              style: TextStyle(color: Colors.black, fontFamily: "OpenSans", fontWeight: FontWeight.bold),
+              style: TextStyle(color: Colors.black, fontFamily: "Lato", fontWeight: FontWeight.bold),
             ),
           ),
           body: PersonalListas(),
@@ -114,8 +114,8 @@ class DataSearch extends SearchDelegate<String> {
 
     return ListView.builder(
       itemBuilder: (context, index) => ListTile(
-        title: Text(lista![index].apellidos),
-        subtitle: Text(lista![index].nombres),
+        title: Text(suggestionList![index].apellidos),
+        subtitle: Text(suggestionList![index].nombres),
       ),
       itemCount: suggestionList!.length,
     );
@@ -134,7 +134,7 @@ class DataSearch extends SearchDelegate<String> {
                   context,
                   MaterialPageRoute(builder: (context) {
                     return NewEditPersonal(
-                      userModel: lista![index],
+                      userModel: suggestionList![index],
                     );
                   }),
                 );

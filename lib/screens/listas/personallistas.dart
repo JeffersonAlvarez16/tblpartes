@@ -27,34 +27,22 @@ class _PersonalListasState extends State<PersonalListas> {
                   return AlertDialog(
                     title: Text(
                       "Desea eliminar el personal:",
-                      style: TextStyle(
-                          fontFamily: "OpenSans",
-                          fontSize: 18,
-                          color: Colors.black54,
-                          fontWeight: FontWeight.bold),
+                      style: TextStyle(fontFamily: "Lato", fontSize: 18, color: Colors.black54, fontWeight: FontWeight.bold),
                     ),
                     content: Text(
                       personal[index].nombres + "?",
-                      style: TextStyle(
-                          fontFamily: "OpenSans",
-                          fontSize: 15,
-                          fontWeight: FontWeight.bold),
+                      style: TextStyle(fontFamily: "Lato", fontSize: 15, fontWeight: FontWeight.bold),
                     ),
                     actions: <Widget>[
                       TextButton(
                         onPressed: () => Navigator.of(context).pop(false),
-                        child: const Text("Cancelar",
-                            style: TextStyle(
-                                fontFamily: "OpenSans",
-                                fontSize: 14,
-                                fontWeight: FontWeight.bold,
-                                color: Color.fromRGBO(218, 0, 55, 1))),
+                        child: const Text("Cancelar", style: TextStyle(fontFamily: "Lato", fontSize: 14, fontWeight: FontWeight.bold, color: Color.fromRGBO(218, 0, 55, 1))),
                       ),
                       TextButton(
                           onPressed: () => Navigator.of(context).pop(true),
                           child: const Text("Eliminar",
                               style: TextStyle(
-                                fontFamily: "OpenSans",
+                                fontFamily: "Lato",
                                 fontSize: 14,
                                 fontWeight: FontWeight.bold,
                               ))),
@@ -72,23 +60,15 @@ class _PersonalListasState extends State<PersonalListas> {
               // Remueve el elemento de nuestro data source.
               await databaseService.eliminarPersonal(personal[index].uid);
 
-              final snackBar = SnackBar(
-                  content: Text('Se elimino el personal correctamente'));
+              final snackBar = SnackBar(content: Text('Se elimino el personal correctamente'));
               ScaffoldMessenger.of(context).showSnackBar(snackBar);
 
               // Muestra un snackbar! Este snackbar tambien podría contener acciones "Undo".
             },
             child: ListTile(
                 title: Text(
-              ("(" + personal[index].grado + ")").toUpperCase() +
-                  " - " +
-                  (personal[index].nombres + " " + personal[index].apellidos)
-                      .toUpperCase(),
-              style: TextStyle(
-                  color: Colors.black87,
-                  fontSize: 16,
-                  fontFamily: "OpenSans",
-                  fontWeight: FontWeight.bold),
+              ("(" + personal[index].grado + ")") + " - " + (personal[index].nombres + " " + personal[index].apellidos),
+              style: TextStyle(color: Colors.black87, fontSize: 14, fontFamily: "Lato", fontWeight: FontWeight.bold),
             )),
           ),
           onTap: () {

@@ -79,13 +79,22 @@ class HomePage extends StatelessWidget {
                     ]; */
                     print(typeUser);
                     if (typeUser == "Comandante") {
-                      return Comandante();
+                      String compania = personal["compania"] ?? "";
+                      contexta.read<Autentication>().changeUserData(compania);
+                      Future.delayed(Duration(seconds: 5));
+                      return SwicthA({"comandante": "comandante", "compania": compania});
                     }
                     if (typeUser == "Sub comandante") {
-                      return SubComandante();
+                      String compania = personal["compania"] ?? "";
+                      contexta.read<Autentication>().changeUserData(compania);
+                      Future.delayed(Duration(seconds: 5));
+                      return SwicthA({"sub_comandante": "sub_comandante", "compania": compania});
                     }
                     if (typeUser == "Oficial de Semana") {
-                      return OficialSemana();
+                      String compania = personal["compania"] ?? "";
+                      contexta.read<Autentication>().changeUserData(compania);
+                      Future.delayed(Duration(seconds: 5));
+                      return SwicthA({"oficial_semana": "oficial_semana", "compania": compania});
                     }
                     if (typeUser == "administrador") {
                       return Administrador();
@@ -133,7 +142,7 @@ Widget label(String text, Color color, double size) {
   return Text(
     text,
     textAlign: TextAlign.center,
-    style: TextStyle(color: color, fontSize: size > 14 ? size : 14, fontFamily: "OpenSans", fontWeight: FontWeight.bold),
+    style: TextStyle(color: color, fontSize: size > 14 ? size : 14, fontFamily: "Lato", fontWeight: FontWeight.bold),
   );
 }
 

@@ -26,12 +26,9 @@ class _AdminCompaniaState extends State<AdminCompania> {
           floatingActionButton: TextButton(
               child: Text(
                 "Registrar Compañia",
-                style: TextStyle(
-                    color: Colors.white, fontFamily: "OpenSans", fontSize: 14),
+                style: TextStyle(color: Colors.white, fontFamily: "Lato", fontSize: 14),
               ),
-              style: ButtonStyle(
-                  backgroundColor:
-                      MaterialStateProperty.all(Color.fromRGBO(218, 0, 55, 1))),
+              style: ButtonStyle(backgroundColor: MaterialStateProperty.all(Color.fromRGBO(218, 0, 55, 1))),
               onPressed: () {
                 Navigator.push(
                   context,
@@ -66,10 +63,7 @@ class _AdminCompaniaState extends State<AdminCompania> {
             ],
             title: Text(
               "Gestión de Compañias",
-              style: TextStyle(
-                  color: Colors.black,
-                  fontFamily: "OpenSans",
-                  fontWeight: FontWeight.bold),
+              style: TextStyle(color: Colors.black, fontFamily: "Lato", fontWeight: FontWeight.bold),
             ),
           ),
           body: CompaniaListas(),

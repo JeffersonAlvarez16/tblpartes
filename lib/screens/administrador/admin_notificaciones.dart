@@ -29,7 +29,7 @@ class _AdminNotificacionesState extends State<AdminNotificaciones> {
           floatingActionButton: TextButton(
               child: Text(
                 "Registrar Notificación",
-                style: TextStyle(color: Colors.white, fontFamily: "OpenSans", fontSize: 14),
+                style: TextStyle(color: Colors.white, fontFamily: "Lato", fontSize: 14),
               ),
               style: ButtonStyle(backgroundColor: MaterialStateProperty.all(Color.fromRGBO(218, 0, 55, 1))),
               onPressed: () {
@@ -64,7 +64,7 @@ class _AdminNotificacionesState extends State<AdminNotificaciones> {
             ],
             title: Text(
               "Gestión de notificaciones",
-              style: TextStyle(color: Colors.black, fontFamily: "OpenSans", fontWeight: FontWeight.bold),
+              style: TextStyle(color: Colors.black, fontFamily: "Lato", fontWeight: FontWeight.bold),
             ),
           ),
           body: NotificacionesLista(),

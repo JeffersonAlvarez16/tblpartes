@@ -143,7 +143,7 @@ class _PersonalState extends State<Personal> {
                     String json = jsonEncode(snapshot.data!.data());
 
                     Map<String, dynamic> personal = jsonDecode(json);
-                    userModel = new UserModel.fromUserModel(uid: personal["uid"], token: personal["token"] ?? "", apellidos: personal["apellidos"], grado: personal["grado"], nombres: personal["nombres"], batallon: personal["batallon"], compania: personal["compania"], cedula: personal["cedula"], email: personal["email"], typeUser: "typeUser");
+                    userModel = new UserModel.fromUserModel(uid: personal["uid"], hasta: personal["hasta"] ?? "", token: personal["token"] ?? "", apellidos: personal["apellidos"], grado: personal["grado"], nombres: personal["nombres"], batallon: personal["batallon"], compania: personal["compania"], cedula: personal["cedula"], email: personal["email"], typeUser: "typeUser");
                     return SingleChildScrollView(
                         padding: EdgeInsets.all(24),
                         child: Column(crossAxisAlignment: CrossAxisAlignment.start, mainAxisAlignment: MainAxisAlignment.start, mainAxisSize: MainAxisSize.max, children: [
@@ -205,7 +205,7 @@ class _PersonalState extends State<Personal> {
                           Divider(),
                           label("Seleccione el horario del parte", Color.fromRGBO(218, 0, 55, 1), 18),
                           StreamBuilder<List<String>>(
-                            stream: streamServices.horariosString,
+                            stream: streamServices.horariosStringPersonal,
                             builder: (context, AsyncSnapshot<List<String>> snapshot) {
                               if (!snapshot.hasData) {
                                 return CircularProgressIndicator();
@@ -224,7 +224,7 @@ class _PersonalState extends State<Personal> {
                                     style: const TextStyle(
                                       color: Colors.black,
                                       fontWeight: FontWeight.bold,
-                                      fontFamily: "OpenSans",
+                                      fontFamily: "Lato",
                                     ),
                                     underline: Container(
                                       width: Medidas.width(100),
@@ -273,6 +273,7 @@ class _PersonalState extends State<Personal> {
 
     return Scaffold(
         bottomNavigationBar: BottomNavigationBar(
+          backgroundColor: Colors.white54,
           type: BottomNavigationBarType.fixed,
           items: <BottomNavigationBarItem>[
             BottomNavigationBarItem(
@@ -306,9 +307,16 @@ class _PersonalState extends State<Personal> {
           onTap: _onItemTapped,
         ),
         appBar: AppBar(
+          brightness: Brightness.dark,
+          backgroundColor: Colors.black12,
+          elevation: 0.0,
+          toolbarHeight: 70,
+          flexibleSpace: Container(
+            decoration: BoxDecoration(borderRadius: BorderRadius.only(bottomLeft: Radius.circular(20), bottomRight: Radius.circular(20)), gradient: LinearGradient(colors: [Colors.red, Colors.pink], begin: Alignment.bottomCenter, end: Alignment.topCenter)),
+          ),
           title: Text(
             'Personal',
-            style: TextStyle(fontFamily: "OpenSans", fontWeight: FontWeight.bold, color: Colors.black),
+            style: TextStyle(fontFamily: "Lato", fontWeight: FontWeight.w900, color: Colors.white),
           ),
           leading: IconButton(
             onPressed: () {},
@@ -318,7 +326,6 @@ class _PersonalState extends State<Personal> {
               height: 100.0,
             ),
           ),
-          backgroundColor: Color.fromRGBO(237, 237, 237, 1),
           actions: <Widget>[
             TextButton.icon(
               icon: Icon(
@@ -333,16 +340,18 @@ class _PersonalState extends State<Personal> {
             ),
           ],
         ),
-        body: Center(
-          child: _widgetOptions.elementAt(_selectedIndex),
-        ));
+        body: Container(
+            color: Colors.black12,
+            child: Center(
+              child: _widgetOptions.elementAt(_selectedIndex),
+            )));
   }
 }
 
 Widget label(String text, Color color, double size) {
   return Text(
     text,
-    style: TextStyle(color: color, fontSize: size > 14 ? size : 14, fontFamily: "OpenSans", fontWeight: FontWeight.bold),
+    style: TextStyle(color: color, fontSize: size > 14 ? size : 14, fontFamily: "Lato", fontWeight: FontWeight.bold),
   );
 }
 
@@ -377,9 +386,10 @@ Widget Notificaciones(context, databaseService) {
       if (snapshot.connectionState == ConnectionState.active && snapshot.hasData) {
         List<QueryDocumentSnapshot<Map<String, dynamic>>> lista = snapshot.data!.docs;
 
-        return SizedBox(
+        return Container(
           height: MediaQuery.of(context).size.height,
           width: MediaQuery.of(context).size.width,
+          padding: EdgeInsets.only(bottom: 150),
           child: ListView.builder(
             shrinkWrap: true,
             itemCount: lista.length,

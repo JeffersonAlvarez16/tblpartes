@@ -7,9 +7,11 @@ import 'package:tblpartes/AutenticationWraper.dart';
 import 'package:tblpartes/HomePage.dart';
 import 'package:tblpartes/screens/autenticate/sign_in.dart';
 import 'package:tblpartes/screens/home/clase_semana.dart';
+import 'package:tblpartes/screens/home/comandante.dart';
 import 'package:tblpartes/screens/home/comandante_compania.dart';
 import 'package:tblpartes/screens/home/oficial_semana.dart';
 import 'package:tblpartes/screens/home/personal.dart';
+import 'package:tblpartes/screens/home/sub_comandante.dart';
 import 'package:tblpartes/services/Constantes.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:tblpartes/services/auntentication.dart';
@@ -71,6 +73,14 @@ class _AppState extends State<App> {
         )
       ],
       child: MaterialApp(
+        theme: ThemeData(brightness: Brightness.light, fontFamily: 'Lato'
+            /* light theme settings */
+            ),
+        darkTheme: ThemeData(
+          brightness: Brightness.light,
+          /* dark theme settings */
+        ),
+        themeMode: ThemeMode.light,
         routes: {
           '/home': (context) => HomePage(),
           '/personal': (context) => Personal(),
@@ -81,10 +91,11 @@ class _AppState extends State<App> {
           ComandanteCompania.route: (context) => ComandanteCompania(
                 arguments: ModalRoute.of(context)!.settings.arguments,
               ),
-          '/oficial_semana': (context) => OficialSemana(),
           '/signIn': (context) => SignIn(),
+          '/oficial_semana': (context) => OficialSemana(),
+          '/comandante': (context) => Comandante(),
+          '/sub_comandante': (context) => SubComandante(),
         },
-        theme: ThemeData(fontFamily: 'OpenSans'),
         localizationsDelegates: [
           GlobalMaterialLocalizations.delegate,
           GlobalWidgetsLocalizations.delegate,
@@ -139,6 +150,6 @@ Widget label(String text, Color color, double size) {
   return Text(
     text,
     textAlign: TextAlign.center,
-    style: TextStyle(color: color, fontSize: size > 14 ? size : 14, fontFamily: "OpenSans", fontWeight: FontWeight.bold),
+    style: TextStyle(color: color, fontSize: size > 14 ? size : 14, fontFamily: "Lato", fontWeight: FontWeight.bold),
   );
 }

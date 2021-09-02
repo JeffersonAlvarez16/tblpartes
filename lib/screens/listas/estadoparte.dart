@@ -258,7 +258,7 @@ class _EstadosParteState extends State<EstadosParte> {
                             style: const TextStyle(
                               color: Colors.black,
                               fontWeight: FontWeight.bold,
-                              fontFamily: "OpenSans",
+                              fontFamily: "Lato",
                             ),
                             onChanged: (dynamic? newValue) {
                               context.read<Autentication>().changeEstado(newValue);
@@ -281,10 +281,8 @@ class _EstadosParteState extends State<EstadosParte> {
                           onPressed: () async {
                             int res = await validateExistencia();
                             if (res == 1) {
-                              bool res = await ButonUpdateGuardia(widget.horaParte, widget.usuario.uid, widget.usuario.nombres, widget.usuario.apellidos, estado, widget.usuario.grado, widget.usuario.compania, databaseService);
+                              bool res = await ButonUpdateGuardia(widget.horaParte, widget.usuario.uid, widget.usuario.nombres, widget.usuario.apellidos, estado, widget.usuario.grado, widget.usuario.compania, databaseService, context);
                               if (res == false) {
-                                final snackBar = SnackBar(content: Text("El parte a cambiar es el mismo que el anterior"));
-                                ScaffoldMessenger.of(context).showSnackBar(snackBar);
                               } else {
                                 final snackBar = SnackBar(content: Text('Se actualizo el parte de las: ' + widget.horaParte));
                                 ScaffoldMessenger.of(context).showSnackBar(snackBar);
@@ -471,10 +469,12 @@ void ButonGuardarGuardia(horaParte, uidPersonal, nombres, apellidos, estado, ran
   data["hasta"] = "";
   data["fechaRegistro"] = desdeString;
   data["hora_registro"] = horaParte;
+  data["create"] = FieldValue.serverTimestamp();
+
   await databaseService.createParte(uid, data);
 }
 
-Future<bool> ButonUpdateGuardia(horaParte, uidPersonal, nombres, apellidos, estado, rango, compania, databaseService) async {
+Future<bool> ButonUpdateGuardia(horaParte, uidPersonal, nombres, apellidos, estado, rango, compania, databaseService, context) async {
   DateTime now = new DateTime.now();
   DateTime date = new DateTime(now.year, now.month, now.day);
   String desdeString = new DateFormat("dd-MM-yyyy").format(date);
@@ -495,12 +495,21 @@ Future<bool> ButonUpdateGuardia(horaParte, uidPersonal, nombres, apellidos, esta
   data["hasta"] = "";
   data["fechaRegistro"] = desdeString;
   data["hora_registro"] = horaParte;
+  data["create"] = FieldValue.serverTimestamp();
   if (dataAnterior["estado"] == estado) {
+    final snackBar = SnackBar(content: Text("El estado a registrar es el mismo en que se encuentra actualmente"));
+    ScaffoldMessenger.of(context).showSnackBar(snackBar);
     return false;
   } else {
-    await databaseService.createParte(docu.docs[0].id, data);
-    await databaseService.saveNotification(compania, estado, nombres, apellidos, horaParte, dataAnterior["estado"], docu.docs[0].id, dataAnterior["uid_personal"]);
-    return true;
+    dynamic reus = await databaseService.saveNotification(compania, estado, nombres, apellidos, horaParte, dataAnterior["estado"], docu.docs[0].id, dataAnterior["uid_personal"]);
+    if (reus == false) {
+      final snackBar = SnackBar(content: Text("No existe un comandate de compañia asignado aun"));
+      ScaffoldMessenger.of(context).showSnackBar(snackBar);
+      return false;
+    } else {
+      await databaseService.createParte(docu.docs[0].id, data);
+      return true;
+    }
   }
 }
 
@@ -525,7 +534,7 @@ void ButonGuardarGuardaNota(horaParte, uidPersonal, nombres, apellidos, nota, es
   data["hasta"] = "";
   data["fechaRegistro"] = desdeString;
   data["hora_registro"] = horaParte;
-
+  data["create"] = FieldValue.serverTimestamp();
   await databaseService.createParte(uid, data);
 }
 
@@ -550,6 +559,7 @@ Future<bool> ButonUpdateGuardaNota(horaParte, uidPersonal, nombres, apellidos, n
   data["hasta"] = "";
   data["fechaRegistro"] = desdeString;
   data["hora_registro"] = horaParte;
+  data["create"] = FieldValue.serverTimestamp();
   if (dataAnterior["estado"] == estado) {
     return false;
   } else {
@@ -579,6 +589,7 @@ void ButonGuardarGuardaNotaFechas(horaParte, desde, hasta, uidPersonal, nombres,
   data["hasta"] = hasta;
   data["fechaRegistro"] = desdeString;
   data["hora_registro"] = horaParte;
+  data["create"] = FieldValue.serverTimestamp();
 
   await databaseService.createParte(uid, data);
 }
@@ -604,6 +615,8 @@ Future<bool> ButonUpdateGuardaNotaFechas(horaParte, desde, hasta, uidPersonal, n
   data["hasta"] = hasta;
   data["fechaRegistro"] = desdeString;
   data["hora_registro"] = horaParte;
+  data["create"] = FieldValue.serverTimestamp();
+
   if (dataAnterior["estado"] == estado) {
     return false;
   } else {
@@ -633,7 +646,7 @@ void ButonGuardarGuardaNotaFechasListado(seleccion, horaParte, desde, hasta, uid
   data["hasta"] = hasta;
   data["fechaRegistro"] = desdeString;
   data["hora_registro"] = horaParte;
-
+  data["create"] = FieldValue.serverTimestamp();
   await databaseService.createParte(uid, data);
 }
 
@@ -658,6 +671,7 @@ Future<bool> ButonUpdateGuardaNotaFechasListado(seleccion, horaParte, desde, has
   data["hasta"] = hasta;
   data["fechaRegistro"] = desdeString;
   data["hora_registro"] = horaParte;
+  data["create"] = FieldValue.serverTimestamp();
   if (dataAnterior["estado"] == estado) {
     return false;
   } else {
@@ -670,7 +684,7 @@ Future<bool> ButonUpdateGuardaNotaFechasListado(seleccion, horaParte, desde, has
 Widget label(String text, Color color, double size, FontWeight weight) {
   return Text(
     text,
-    style: TextStyle(color: color, fontSize: size > 14 ? size : 14, fontFamily: "OpenSans", fontWeight: weight != null ? weight : FontWeight.bold),
+    style: TextStyle(color: color, fontSize: size > 14 ? size : 14, fontFamily: "Lato", fontWeight: weight != null ? weight : FontWeight.bold),
   );
 }
 
@@ -686,7 +700,7 @@ Widget textField({String? hintText, IconData? icono, bool enabled = false, bool 
       keyboardType: textInputTipe,
       obscureText: obscureText,
       onChanged: onChanged,
-      style: TextStyle(color: Colors.black, fontSize: 14, fontWeight: FontWeight.bold, fontFamily: "OpenSans", fontStyle: FontStyle.normal),
+      style: TextStyle(color: Colors.black, fontSize: 14, fontWeight: FontWeight.bold, fontFamily: "Lato", fontStyle: FontStyle.normal),
       textAlign: TextAlign.justify,
       decoration: InputDecoration(
           hintText: hintText,

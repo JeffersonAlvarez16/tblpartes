@@ -25,7 +25,7 @@ class StreamServices {
   }
 
   Stream<List<Estados>> get estados {
-    return firestore.collection("estados").snapshots().map(databaseService.estadosListFromSnapshot);
+    return firestore.collection("estados").where("nombre", isNotEqualTo: "Falto").snapshots().map(databaseService.estadosListFromSnapshot);
   }
 
   Stream<List<Notificaciones>> get notificaciones {
@@ -42,6 +42,14 @@ class StreamServices {
 
   Stream<List<String>> get horariosString {
     return firestore.collection("horarios").snapshots().map(databaseService.horariosListFromSnapshotString);
+  }
+
+  Stream<List<String>> get horariosStringTrue {
+    return firestore.collection("horarios").where("estado", isEqualTo: true).snapshots().map(databaseService.horariosListFromSnapshotString);
+  }
+
+  Stream<List<String>> get horariosStringPersonal {
+    return firestore.collection("horarios").where("estado", isEqualTo: true).snapshots().map(databaseService.horariosListFromSnapshotString);
   }
 
   Stream<List<String>> get estadosString {

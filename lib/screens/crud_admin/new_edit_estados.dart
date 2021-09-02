@@ -61,7 +61,7 @@ class _NewEditEstadosState extends State<NewEditEstados> {
         backgroundColor: Color.fromRGBO(237, 237, 237, 1),
         title: Text(
           "Datos del estado",
-          style: TextStyle(color: Colors.black, fontFamily: "OpenSans", fontWeight: FontWeight.bold),
+          style: TextStyle(color: Colors.black, fontFamily: "Lato", fontWeight: FontWeight.bold),
         ),
       ),
       body: SingleChildScrollView(
@@ -97,7 +97,7 @@ class _NewEditEstadosState extends State<NewEditEstados> {
                               });
                             },
                           ),
-                          Expanded(child: Text("Marque esta casilla, si debe dejar una nota ", style: TextStyle(color: Colors.black, fontFamily: "OpenSans", fontSize: 12))),
+                          Expanded(child: Text("Marque esta casilla, si debe dejar una nota ", style: TextStyle(color: Colors.black, fontFamily: "Lato", fontSize: 12))),
                         ],
                       )
                     ],
@@ -115,7 +115,7 @@ class _NewEditEstadosState extends State<NewEditEstados> {
                               });
                             },
                           ),
-                          Expanded(child: Text("Marque esta casilla, si debe una fecha de salida y regreso", style: TextStyle(color: Colors.black, fontFamily: "OpenSans", fontSize: 12))),
+                          Expanded(child: Text("Marque esta casilla, si debe una fecha de salida y regreso", style: TextStyle(color: Colors.black, fontFamily: "Lato", fontSize: 12))),
                         ],
                       )
                     ],
@@ -138,7 +138,7 @@ class _NewEditEstadosState extends State<NewEditEstados> {
                               }
                             },
                           ),
-                          Expanded(child: Text("Marque está casilla, si debe seleccionar de un listado", style: TextStyle(color: Colors.black, fontFamily: "OpenSans", fontSize: 12))),
+                          Expanded(child: Text("Marque está casilla, si debe seleccionar de un listado", style: TextStyle(color: Colors.black, fontFamily: "Lato", fontSize: 12))),
                         ],
                       )
                     ],
@@ -162,7 +162,7 @@ class _NewEditEstadosState extends State<NewEditEstados> {
                                         nombreLista = value;
                                       });
                                     },
-                                    style: TextStyle(color: Colors.black, fontSize: 14, fontWeight: FontWeight.bold, fontFamily: "OpenSans", fontStyle: FontStyle.normal),
+                                    style: TextStyle(color: Colors.black, fontSize: 14, fontWeight: FontWeight.bold, fontFamily: "Lato", fontStyle: FontStyle.normal),
                                     textAlign: TextAlign.justify,
                                     decoration: InputDecoration(
                                       enabledBorder: UnderlineInputBorder(
@@ -174,8 +174,8 @@ class _NewEditEstadosState extends State<NewEditEstados> {
                                       contentPadding: EdgeInsets.all(8),
                                       hintText: "Nombre",
                                       labelText: "Nombre",
-                                      hintStyle: TextStyle(fontWeight: FontWeight.w400, color: Colors.black, fontFamily: "OpenSans"),
-                                      labelStyle: TextStyle(fontWeight: FontWeight.w400, color: Colors.black, fontFamily: "OpenSans"),
+                                      hintStyle: TextStyle(fontWeight: FontWeight.w400, color: Colors.black, fontFamily: "Lato"),
+                                      labelStyle: TextStyle(fontWeight: FontWeight.w400, color: Colors.black, fontFamily: "Lato"),
                                     ),
                                   ),
                                 ),
@@ -253,7 +253,7 @@ Widget ButonGuardar(_formKey, databaseService, context, nombre, nota, fechas, li
   return TextButton(
       child: Text(
         "Guardar Datos",
-        style: TextStyle(color: Colors.white, fontFamily: "OpenSans", fontSize: 14),
+        style: TextStyle(color: Colors.white, fontFamily: "Lato", fontSize: 14),
       ),
       style: ButtonStyle(backgroundColor: MaterialStateProperty.all(Color.fromRGBO(218, 0, 55, 1))),
       onPressed: () async {
@@ -277,7 +277,7 @@ Widget ButonUpdate(_formKey, databaseService, context, nombre, uid, nota, fechas
   return TextButton(
       child: Text(
         "Actualizar Datos",
-        style: TextStyle(color: Colors.white, fontFamily: "OpenSans", fontSize: 14),
+        style: TextStyle(color: Colors.white, fontFamily: "Lato", fontSize: 14),
       ),
       style: ButtonStyle(backgroundColor: MaterialStateProperty.all(Color.fromRGBO(218, 0, 55, 1))),
       onPressed: () async {
@@ -307,7 +307,7 @@ Widget textField({String? hintText, IconData? icono, String? valor, bool obscure
       keyboardType: textInputTipe,
       obscureText: obscureText,
       onChanged: onChanged,
-      style: TextStyle(color: Colors.black, fontSize: 14, fontWeight: FontWeight.bold, fontFamily: "OpenSans", fontStyle: FontStyle.normal),
+      style: TextStyle(color: Colors.black, fontSize: 14, fontWeight: FontWeight.bold, fontFamily: "Lato", fontStyle: FontStyle.normal),
       textAlign: TextAlign.justify,
       decoration: InputDecoration(
         enabledBorder: UnderlineInputBorder(
@@ -319,8 +319,8 @@ Widget textField({String? hintText, IconData? icono, String? valor, bool obscure
         contentPadding: EdgeInsets.all(8),
         hintText: hintText,
         labelText: hintText,
-        hintStyle: TextStyle(fontWeight: FontWeight.w400, color: Colors.black, fontFamily: "OpenSans"),
-        labelStyle: TextStyle(fontWeight: FontWeight.w400, color: Colors.black, fontFamily: "OpenSans"),
+        hintStyle: TextStyle(fontWeight: FontWeight.w400, color: Colors.black, fontFamily: "Lato"),
+        labelStyle: TextStyle(fontWeight: FontWeight.w400, color: Colors.black, fontFamily: "Lato"),
       ),
     ),
   );

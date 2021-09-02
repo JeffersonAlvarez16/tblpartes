@@ -28,22 +28,22 @@ class _NotificacionesListaState extends State<NotificacionesLista> {
                   return AlertDialog(
                     title: Text(
                       "Desea eliminar el estado:",
-                      style: TextStyle(fontFamily: "OpenSans", fontSize: 18, color: Colors.black87, fontWeight: FontWeight.bold),
+                      style: TextStyle(fontFamily: "Lato", fontSize: 18, color: Colors.black87, fontWeight: FontWeight.bold),
                     ),
                     content: Text(
                       notificaciones[index].name + "?",
-                      style: TextStyle(fontFamily: "OpenSans", fontSize: 15, fontWeight: FontWeight.bold),
+                      style: TextStyle(fontFamily: "Lato", fontSize: 15, fontWeight: FontWeight.bold),
                     ),
                     actions: <Widget>[
                       TextButton(
                         onPressed: () => Navigator.of(context).pop(false),
-                        child: const Text("Cancelar", style: TextStyle(fontFamily: "OpenSans", fontSize: 14, fontWeight: FontWeight.bold, color: Color.fromRGBO(218, 0, 55, 1))),
+                        child: const Text("Cancelar", style: TextStyle(fontFamily: "Lato", fontSize: 14, fontWeight: FontWeight.bold, color: Color.fromRGBO(218, 0, 55, 1))),
                       ),
                       TextButton(
                           onPressed: () => Navigator.of(context).pop(true),
                           child: const Text("Eliminar",
                               style: TextStyle(
-                                fontFamily: "OpenSans",
+                                fontFamily: "Lato",
                                 fontSize: 14,
                                 fontWeight: FontWeight.bold,
                               ))),
@@ -66,11 +66,18 @@ class _NotificacionesListaState extends State<NotificacionesLista> {
 
               // Muestra un snackbar! Este snackbar tambien podría contener acciones "Undo".
             },
-            child: ListTile(
-                title: Text(
-              notificaciones[index].name.toUpperCase(),
-              style: TextStyle(color: Colors.black87, fontSize: 16, fontFamily: "OpenSans", fontWeight: FontWeight.bold),
-            )),
+            child: Container(
+              margin: EdgeInsets.only(bottom: 12),
+              child: ListTile(
+                  subtitle: Text(
+                    notificaciones[index].subject,
+                    style: TextStyle(color: Colors.black45, fontSize: 12, fontFamily: "Lato", fontWeight: FontWeight.bold),
+                  ),
+                  title: Text(
+                    notificaciones[index].name,
+                    style: TextStyle(color: Colors.black87, fontSize: 16, fontFamily: "Lato", fontWeight: FontWeight.bold),
+                  )),
+            ),
           ),
           onTap: () {},
         );

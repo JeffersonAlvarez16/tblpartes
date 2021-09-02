@@ -27,34 +27,22 @@ class _BatallonListasState extends State<BatallonListas> {
                   return AlertDialog(
                     title: Text(
                       "Desea eliminar el batallon:",
-                      style: TextStyle(
-                          fontFamily: "OpenSans",
-                          fontSize: 18,
-                          color: Colors.black54,
-                          fontWeight: FontWeight.bold),
+                      style: TextStyle(fontFamily: "Lato", fontSize: 18, color: Colors.black54, fontWeight: FontWeight.bold),
                     ),
                     content: Text(
                       batallones[index].nombre + "?",
-                      style: TextStyle(
-                          fontFamily: "OpenSans",
-                          fontSize: 15,
-                          fontWeight: FontWeight.bold),
+                      style: TextStyle(fontFamily: "Lato", fontSize: 15, fontWeight: FontWeight.bold),
                     ),
                     actions: <Widget>[
                       TextButton(
                         onPressed: () => Navigator.of(context).pop(false),
-                        child: const Text("Cancelar",
-                            style: TextStyle(
-                                fontFamily: "OpenSans",
-                                fontSize: 14,
-                                fontWeight: FontWeight.bold,
-                                color: Color.fromRGBO(218, 0, 55, 1))),
+                        child: const Text("Cancelar", style: TextStyle(fontFamily: "Lato", fontSize: 14, fontWeight: FontWeight.bold, color: Color.fromRGBO(218, 0, 55, 1))),
                       ),
                       TextButton(
                           onPressed: () => Navigator.of(context).pop(true),
                           child: const Text("Eliminar",
                               style: TextStyle(
-                                fontFamily: "OpenSans",
+                                fontFamily: "Lato",
                                 fontSize: 14,
                                 fontWeight: FontWeight.bold,
                               ))),
@@ -72,20 +60,15 @@ class _BatallonListasState extends State<BatallonListas> {
               // Remueve el elemento de nuestro data source.
               await databaseService.eliminarBatallon(batallones[index].uid);
 
-              final snackBar = SnackBar(
-                  content: Text('Se elimino el batallón correctamente'));
+              final snackBar = SnackBar(content: Text('Se elimino el batallón correctamente'));
               ScaffoldMessenger.of(context).showSnackBar(snackBar);
 
               // Muestra un snackbar! Este snackbar tambien podría contener acciones "Undo".
             },
             child: ListTile(
                 title: Text(
-              batallones[index].nombre.toUpperCase(),
-              style: TextStyle(
-                  color: Colors.black87,
-                  fontSize: 16,
-                  fontFamily: "OpenSans",
-                  fontWeight: FontWeight.bold),
+              batallones[index].nombre,
+              style: TextStyle(color: Colors.black87, fontSize: 16, fontFamily: "Lato", fontWeight: FontWeight.bold),
             )),
           ),
           onTap: () {

@@ -41,7 +41,7 @@ class _NewEditNotificacionState extends State<NewEditNotificacion> {
         backgroundColor: Color.fromRGBO(237, 237, 237, 1),
         title: Text(
           "Datos de la notificación",
-          style: TextStyle(color: Colors.black, fontFamily: "OpenSans", fontWeight: FontWeight.bold),
+          style: TextStyle(color: Colors.black, fontFamily: "Lato", fontWeight: FontWeight.bold),
         ),
       ),
       body: SingleChildScrollView(
@@ -91,7 +91,7 @@ Widget ButonGuardar(_formKey, databaseService, context, name, subject) {
   return TextButton(
       child: Text(
         "Guardar Datos",
-        style: TextStyle(color: Colors.white, fontFamily: "OpenSans", fontSize: 14),
+        style: TextStyle(color: Colors.white, fontFamily: "Lato", fontSize: 14),
       ),
       style: ButtonStyle(backgroundColor: MaterialStateProperty.all(Color.fromRGBO(218, 0, 55, 1))),
       onPressed: () async {
@@ -111,7 +111,7 @@ Widget ButonUpdate(_formKey, databaseService, context, name, subject, uid) {
   return TextButton(
       child: Text(
         "Actualizar Datos",
-        style: TextStyle(color: Colors.white, fontFamily: "OpenSans", fontSize: 14),
+        style: TextStyle(color: Colors.white, fontFamily: "Lato", fontSize: 14),
       ),
       style: ButtonStyle(backgroundColor: MaterialStateProperty.all(Color.fromRGBO(218, 0, 55, 1))),
       onPressed: () async {
@@ -138,7 +138,7 @@ Widget textField({String? hintText, IconData? icono, String? valor, bool obscure
       keyboardType: textInputTipe,
       obscureText: obscureText,
       onChanged: onChanged,
-      style: TextStyle(color: Colors.black, fontSize: 14, fontWeight: FontWeight.bold, fontFamily: "OpenSans", fontStyle: FontStyle.normal),
+      style: TextStyle(color: Colors.black, fontSize: 14, fontWeight: FontWeight.bold, fontFamily: "Lato", fontStyle: FontStyle.normal),
       textAlign: TextAlign.justify,
       decoration: InputDecoration(
         enabledBorder: UnderlineInputBorder(
@@ -149,7 +149,7 @@ Widget textField({String? hintText, IconData? icono, String? valor, bool obscure
         ),
         contentPadding: EdgeInsets.all(8),
         hintText: hintText,
-        hintStyle: TextStyle(fontWeight: FontWeight.w400, color: Colors.black, fontFamily: "OpenSans"),
+        hintStyle: TextStyle(fontWeight: FontWeight.w400, color: Colors.black, fontFamily: "Lato"),
       ),
     ),
   );
