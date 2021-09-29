@@ -11,18 +11,21 @@ class Autentication {
   final _hasta = StreamController<String>.broadcast();
   final _userData = StreamController<String>.broadcast();
   final _horario = StreamController<String>.broadcast();
+  final _lista = StreamController<List<dynamic>>.broadcast();
 
   Stream<String> get estadoSelec => _estadoSelec.stream;
   Stream<String> get desde => _desde.stream;
   Stream<String> get hasta => _hasta.stream;
   Stream<String> get userData => _userData.stream;
   Stream<String> get horario => _horario.stream;
+  Stream<List<dynamic>> get listaTemporalR => _lista.stream;
 
   Function(String) get changeEstado => _estadoSelec.sink.add;
   Function(String) get changeDesde => _desde.sink.add;
   Function(String) get changeHasta => _hasta.sink.add;
   Function(String) get changeUserData => _userData.sink.add;
   Function(String) get changeHorario => _horario.sink.add;
+  Function(List<dynamic>) get changeLista => _lista.sink.add;
 
   Autentication(this._firebaseAuth);
 

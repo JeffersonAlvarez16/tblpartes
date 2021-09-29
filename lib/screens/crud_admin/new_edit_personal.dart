@@ -19,12 +19,17 @@ class _NewEditPersonalState extends State<NewEditPersonal> {
   final DatabaseService databaseService = new DatabaseService();
 
   static const List<String> perfilesUsuarios = <String>[
+    "GRAE",
+    "GRAD",
+    "GRAB",
+    "CRNL",
     "TCRN",
     "MAYO",
     "CAPT",
     "TNTE",
     "SUBT",
-    "SUBS",
+    "SUBM",
+    "SUBP",
     "SUBS",
     "SGOP",
     "SGOS",

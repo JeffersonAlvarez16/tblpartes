@@ -501,7 +501,7 @@ Future<bool> ButonUpdateGuardia(horaParte, uidPersonal, nombres, apellidos, esta
     ScaffoldMessenger.of(context).showSnackBar(snackBar);
     return false;
   } else {
-    dynamic reus = await databaseService.saveNotification(compania, estado, nombres, apellidos, horaParte, dataAnterior["estado"], docu.docs[0].id, dataAnterior["uid_personal"]);
+    dynamic reus = await databaseService.saveNotification(compania, estado, nombres, apellidos, horaParte, dataAnterior["estado"], docu.docs[0].id, dataAnterior["uid_personal"], "", "");
     if (reus == false) {
       final snackBar = SnackBar(content: Text("No existe un comandate de compañia asignado aun"));
       ScaffoldMessenger.of(context).showSnackBar(snackBar);
@@ -564,7 +564,7 @@ Future<bool> ButonUpdateGuardaNota(horaParte, uidPersonal, nombres, apellidos, n
     return false;
   } else {
     await databaseService.createParte(docu.docs[0].id, data);
-    await databaseService.saveNotification(compania, estado, nombres, apellidos, horaParte, dataAnterior["estado"], docu.docs[0].id, dataAnterior["uid_personal"]);
+    await databaseService.saveNotification(compania, estado, nombres, apellidos, horaParte, dataAnterior["estado"], docu.docs[0].id, dataAnterior["uid_personal"], "", "");
     return true;
   }
 }
@@ -621,7 +621,7 @@ Future<bool> ButonUpdateGuardaNotaFechas(horaParte, desde, hasta, uidPersonal, n
     return false;
   } else {
     await databaseService.createParte(docu.docs[0].id, data);
-    await databaseService.saveNotification(compania, estado, nombres, apellidos, horaParte, dataAnterior["estado"], docu.docs[0].id, dataAnterior["uid_personal"]);
+    await databaseService.saveNotification(compania, estado, nombres, apellidos, horaParte, dataAnterior["estado"], docu.docs[0].id, dataAnterior["uid_personal"], desde, hasta);
     return true;
   }
 }
@@ -676,7 +676,7 @@ Future<bool> ButonUpdateGuardaNotaFechasListado(seleccion, horaParte, desde, has
     return false;
   } else {
     await databaseService.createParte(docu.docs[0].id, data);
-    await databaseService.saveNotification(compania, estado, nombres, apellidos, horaParte, dataAnterior["estado"], docu.docs[0].id, dataAnterior["uid_personal"]);
+    await databaseService.saveNotification(compania, estado, nombres, apellidos, horaParte, dataAnterior["estado"], docu.docs[0].id, dataAnterior["uid_personal"], desde, hasta);
     return true;
   }
 }

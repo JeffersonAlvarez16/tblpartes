@@ -305,7 +305,7 @@ class DatabaseService {
     return await firestore.collection("partes").where("uid_personal", isEqualTo: uidPersonal).where("fechaRegistro", isEqualTo: fecha).where("hora_registro", isEqualTo: hora).get();
   }
 
-  Future saveNotification(String compania, String estado, String nombres, String apellidos, String horario, String parteAnterior, String idParte, String uid_personal) async {
+  Future saveNotification(String compania, String estado, String nombres, String apellidos, String horario, String parteAnterior, String idParte, String uid_personal, desde, hasta) async {
     try {
       DateTime now = new DateTime.now();
       DateTime date = new DateTime(now.year, now.month, now.day);
@@ -316,7 +316,13 @@ class DatabaseService {
       DocumentSnapshot<Map<String, dynamic>> personal = await firestore.collection("personal").doc(id).get();
       Map<String, dynamic>? data = personal.data();
       String token = data!["token"];
-      return await firestore.collection("notification").add({"name": "Autorización de cambio de estado en el parte", "subject": "El Sr. $nombres $apellidos desea hacer el cambio de esatado en el parte de: $horario, del dia $desdeString", "token": token, "parte_anterior": parteAnterior, "parte_nuevo": estado, "uid": dataUser["uid"], "estado": "en_espera", "create": FieldValue.serverTimestamp(), "id_parte": idParte, "atendido": false, "uid_personal": uid_personal});
+      String mensaje = "";
+      if (desde.toString().length > 0) {
+        mensaje = "El Sr. $nombres $apellidos desea hacer el cambio de esatado a $estado en el parte de: $horario, del dia $desdeString desde ña fecha $desde hasta $hasta";
+      } else {
+        mensaje = "El Sr. $nombres $apellidos desea hacer el cambio de esatado a $estado en el parte de: $horario, del dia $desdeString";
+      }
+      return await firestore.collection("notification").add({"name": "Autorización de cambio de estado en el parte", "subject": mensaje, "token": token, "parte_anterior": parteAnterior, "parte_nuevo": estado, "uid": dataUser["uid"], "estado": "en_espera", "create": FieldValue.serverTimestamp(), "id_parte": idParte, "atendido": false, "uid_personal": uid_personal});
     } catch (e) {
       return false;
     }
@@ -341,13 +347,13 @@ class DatabaseService {
   Stream<QuerySnapshot<Map<String, dynamic>>> notificacionesExistentes() {
     String uid = _auth.currentUser!.uid;
     print(uid);
-    return firestore.collection("notification").where("uid", isEqualTo: uid).orderBy("create").snapshots();
+    return firestore.collection("notification").where("uid", isEqualTo: uid).orderBy("create", descending: true).snapshots();
   }
 
   Stream<QuerySnapshot<Map<String, dynamic>>> notificacionesExistentesUser() {
     String uid = _auth.currentUser!.uid;
 
-    return firestore.collection("notifications").where("uid", isEqualTo: uid).orderBy("create").snapshots();
+    return firestore.collection("notifications").where("uid", isEqualTo: uid).orderBy("create", descending: true).snapshots();
   }
 
   Future cambiarParte(String idParte, String idNotifi, String estado, bool type, String idUser) async {

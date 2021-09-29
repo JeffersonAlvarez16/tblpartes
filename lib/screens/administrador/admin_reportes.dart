@@ -166,10 +166,10 @@ class _AdminReportesState extends State<AdminReportes> {
     print("valor total:" + listaTotal.length.toString());
     print("valor ind" + lista.length.toString());
     for (var i = 0; i < listaTotal.length; i++) {
-      if (i <= 12) {
+      if (i <= 10) {
         listaNueva.add(listaTotal[i]);
       } else {
-        if (i == 13) {
+        if (i == 11) {
           listaARR.add(listaNueva);
           listaNueva = [];
           listaNueva.add(listaTotal[i]);

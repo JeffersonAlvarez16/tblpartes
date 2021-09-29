@@ -5,7 +5,6 @@ import 'package:tblpartes/screens/autenticate/recuperar.dart';
 import 'package:tblpartes/screens/crud_admin/new_edit_personal.dart';
 import 'package:tblpartes/services/Constantes.dart';
 import 'package:tblpartes/services/auntentication.dart';
-import 'package:tblpartes/services/auth.dart';
 import 'package:tblpartes/services/database.dart';
 
 class SignIn extends StatefulWidget {

@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:typed_data';
 
 import 'package:badges/badges.dart';
@@ -174,31 +175,29 @@ class _SubComandanteState extends State<SubComandante> {
     List<List<dynamic>> listaARR = [];
     List<dynamic> listaNueva = [];
     int contadorLista = 0;
-    print("valor total:" + listaTotal.length.toString());
-    print("valor ind" + lista.length.toString());
-    for (var i = 0; i < listaTotal.length; i++) {
-      if (i <= 15) {
-        listaNueva.add(listaTotal[i]);
+    List<dynamic> listaTotalOrder = filtrarLista(listaTotal);
+    for (var i = 0; i < listaTotalOrder.length; i++) {
+      if (i <= 10) {
+        listaNueva.add(listaTotalOrder[i]);
       } else {
-        if (i == 16) {
+        if (i == 11) {
           listaARR.add(listaNueva);
           listaNueva = [];
-          listaNueva.add(listaTotal[i]);
+          listaNueva.add(listaTotalOrder[i]);
         } else {
           if (contadorLista <= 22) {
-            listaNueva.add(listaTotal[i]);
+            listaNueva.add(listaTotalOrder[i]);
             contadorLista += 1;
           } else {
             listaARR.add(listaNueva);
             contadorLista = 0;
             listaNueva = [];
-            listaNueva.add(listaTotal[i]);
+            listaNueva.add(listaTotalOrder[i]);
           }
         }
       }
     }
     listaARR.add(listaNueva);
-    print("LISTA: " + listaARR.length.toString());
 
     for (var i = 0; i < listaARR.length; i++) {
       if (i == 0) {
@@ -337,6 +336,14 @@ class _SubComandanteState extends State<SubComandante> {
 
   String texto = "Sin filtrar";
 
+  List<dynamic> listaTest = [];
+  final StreamController<List<dynamic>> _streamController = StreamController<List<dynamic>>.broadcast();
+  @override
+  void dispose() {
+    _streamController.close();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     List<Widget> _widgetOptions = <Widget>[
@@ -348,8 +355,302 @@ class _SubComandanteState extends State<SubComandante> {
           }
           if (snapshot.hasData && snapshot.connectionState == ConnectionState.active) {
             Map<String, dynamic> data = snapshot.data!.docs[0].data();
-            return Home(context, 'widget.arguments["compania"]', data["hora"]);
+            DateTime selectedDate = new DateTime.now();
+            String desdeString = new DateFormat("dd-MM-yyyy").format(selectedDate);
+
+            String compania = "";
+            dynamic hora = data["hora"];
+            return SingleChildScrollView(
+              child: Column(crossAxisAlignment: CrossAxisAlignment.start, mainAxisAlignment: MainAxisAlignment.start, children: [
+                SizedBox(
+                  height: 12,
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Container(
+                      margin: EdgeInsets.only(left: 12),
+                      child: label("Lista de registros", Colors.black, 18),
+                    ),
+                    Row(
+                      children: [
+                        Container(
+                          margin: EdgeInsets.only(right: 12),
+                          child: IconButton(
+                            icon: Icon(Icons.refresh),
+                            onPressed: () {
+                              _streamController.add(listaTest);
+                            },
+                          ),
+                        ),
+                        Container(
+                          margin: EdgeInsets.only(right: 12),
+                          child: IconButton(
+                            icon: Icon(Icons.search),
+                            onPressed: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(builder: (context) => _BuscarParte(lista: listaTest)),
+                              );
+                            },
+                          ),
+                        ),
+                      ],
+                    )
+                  ],
+                ),
+                StreamBuilder(
+                  stream: FirebaseFirestore.instance.collection("partes").where("fechaRegistro", isEqualTo: desdeString).where("hora_registro", isEqualTo: hora).snapshots(),
+                  builder: (context, AsyncSnapshot<QuerySnapshot<Map<String, dynamic>>> snapshot) {
+                    if (!snapshot.hasData) {
+                      return CircularProgressIndicator();
+                    }
+                    if (snapshot.connectionState == ConnectionState.active) {
+                      List<dynamic> list = snapshot.data!.docs.map((DocumentSnapshot doc) {
+                        return doc.data();
+                      }).toList();
+                      List<dynamic> listrep = [];
+                      listaTest = filtrarLista(list);
+
+                      _streamController.add(listaTest);
+                      for (var i = 0; i < list.length; i++) {
+                        if (listrep.length == 0) {
+                          list[i]["contador"] = 1;
+                          listrep.add(list[i]);
+                        } else {
+                          List<dynamic> lsi = listrep.where((element) => element["estado"] == list[i]["estado"]).toList();
+                          if (!lsi.isEmpty) {
+                            int indexUpdate = listrep.indexWhere((element) => element["estado"] == list[i]["estado"]);
+
+                            int numero = listrep[indexUpdate]["contador"];
+
+                            listrep[indexUpdate]["contador"] = numero + 1;
+                          } else {
+                            list[i]["contador"] = 1;
+                            listrep.add(list[i]);
+                          }
+                        }
+                      }
+                      //return Text("data");
+
+                      return Container(
+                          padding: EdgeInsets.only(left: 56, top: 12),
+                          child: Column(children: [
+                            ListView.builder(
+                              shrinkWrap: true,
+                              itemCount: listrep.length,
+                              itemBuilder: (context, index) {
+                                return Container(
+                                    padding: EdgeInsets.only(top: 16),
+                                    child: InkWell(
+                                        onTap: () {
+                                          List<dynamic> tempo = listaTest.where((element) => element["estado"] == listrep[index]["estado"]).toList();
+
+                                          _streamController.add(tempo);
+                                        },
+                                        child: Column(
+                                          mainAxisSize: MainAxisSize.max,
+                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          mainAxisAlignment: MainAxisAlignment.start,
+                                          children: [
+                                            Row(
+                                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                              children: [
+                                                Container(
+                                                  child: label(listrep[index]["estado"], Colors.black, 16),
+                                                ),
+                                                Container(
+                                                  width: 100,
+                                                  child: label((listrep[index]["contador"]).toString(), Colors.black, 15),
+                                                ),
+                                              ],
+                                            )
+                                          ],
+                                        )));
+                              },
+                            ),
+                          ]));
+                    }
+                    return Center(
+                      child: Text("Sin registros"),
+                    );
+                  },
+                ),
+                StreamBuilder<List<dynamic>>(
+                  stream: _streamController.stream,
+                  builder: (context, snapshot) {
+                    List<dynamic>? lt = snapshot.data;
+                    if (snapshot.hasData) {
+                      return SingleChildScrollView(
+                        scrollDirection: Axis.horizontal,
+                        child: DataTable(
+                          dataRowHeight: 80,
+                          dataTextStyle: TextStyle(fontSize: 12, color: Colors.black),
+                          headingTextStyle: TextStyle(fontSize: 12, color: Colors.black, fontWeight: FontWeight.bold),
+                          columns: const <DataColumn>[
+                            DataColumn(label: Text('#')),
+                            DataColumn(label: Text('Grado')),
+                            DataColumn(label: Text('Apellidos\ny Nombres')),
+                            DataColumn(label: Text('Horario\nparte')),
+                            DataColumn(label: Text('Observacion')),
+                          ],
+                          rows: lt!.map((e) {
+                            var index = lt.indexOf(e);
+                            return DataRow(cells: [
+                              DataCell(Text((index + 1).toString())),
+                              DataCell(Text(e["rango"])),
+                              DataCell(SizedBox(
+                                width: 100,
+                                child: Text(e["nombres"] + "\n" + e["apellidos"]),
+                              )),
+                              DataCell(Text(e["hora_registro"])),
+                              DataCell(
+                                Text(e["estado"]),
+                              ),
+                            ]);
+                          }).toList(),
+                        ),
+                      );
+                    }
+                    _streamController.add(listaTest);
+                    return CircularProgressIndicator();
+                  },
+                )
+              ]),
+            );
           }
+
+          Widget Notificaciones(context, databaseService) {
+            return SingleChildScrollView(
+                child: StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
+              stream: databaseService.notificacionesExistentes(),
+              builder: (context, snapshot) {
+                if (!snapshot.hasData) {
+                  return Center(
+                    child: Text("Cargango"),
+                  );
+                }
+                if (snapshot.connectionState == ConnectionState.active && snapshot.hasData) {
+                  List<QueryDocumentSnapshot<Map<String, dynamic>>> lista = snapshot.data!.docs;
+
+                  return SizedBox(
+                    height: MediaQuery.of(context).size.height,
+                    width: MediaQuery.of(context).size.width,
+                    child: ListView.builder(
+                      shrinkWrap: true,
+                      itemCount: lista.length,
+                      itemBuilder: (context, index) {
+                        Map<String, dynamic> dataNoti = lista[index].data();
+
+                        return Card(
+                          child: Container(
+                            padding: EdgeInsets.all(8),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              mainAxisSize: MainAxisSize.min,
+                              children: <Widget>[
+                                ListTile(
+                                  title: Text(dataNoti["name"].toString()),
+                                  subtitle: Text(dataNoti["subject"].toString()),
+                                ),
+                                SizedBox(
+                                  height: 12,
+                                ),
+                                Container(
+                                  padding: EdgeInsets.only(left: 16),
+                                  child: Text("Parte anterior: " + dataNoti["parte_anterior"]),
+                                ),
+                                SizedBox(
+                                  height: 12,
+                                ),
+                                Container(
+                                  padding: EdgeInsets.only(left: 16),
+                                  child: Text("Parte Actual: " + dataNoti["parte_nuevo"]),
+                                ),
+                                SizedBox(
+                                  height: 16,
+                                ),
+                                if (dataNoti["estado"] == "aceptado")
+                                  Container(
+                                    margin: EdgeInsets.only(bottom: 12),
+                                    padding: EdgeInsets.only(left: 16),
+                                    child: Text("Cambio de parte aceptado"),
+                                  ),
+                                if (dataNoti["estado"] == "en_espera")
+                                  Container(
+                                    margin: EdgeInsets.only(bottom: 12),
+                                    padding: EdgeInsets.only(left: 16),
+                                    child: Text("Cambio de estado a la espera de respuesta"),
+                                  ),
+                                if (dataNoti["estado"] == "rechazado")
+                                  Container(
+                                    margin: EdgeInsets.only(bottom: 12),
+                                    padding: EdgeInsets.only(left: 16),
+                                    child: Text("Cambio de parte rechazado"),
+                                  ),
+                                if (dataNoti["atendido"] == false)
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                    children: [
+                                      Container(
+                                        width: 100,
+                                        height: 32,
+                                        decoration: BoxDecoration(
+                                            color: Colors.blueGrey,
+                                            borderRadius: BorderRadius.only(
+                                              topLeft: Radius.circular(20),
+                                              bottomRight: Radius.circular(20),
+                                            )),
+                                        child: TextButton(
+                                          child: Text(
+                                            "Rechazar",
+                                            style: TextStyle(color: Colors.white),
+                                          ),
+                                          onPressed: () async {
+                                            await databaseService.cambiarParte(dataNoti["id_parte"], lista[index].id, dataNoti["parte_anterior"], false);
+                                          },
+                                        ),
+                                      ),
+                                      Container(
+                                        width: 100,
+                                        height: 32,
+                                        decoration: BoxDecoration(
+                                            color: Color.fromRGBO(218, 0, 55, 1),
+                                            borderRadius: BorderRadius.only(
+                                              topLeft: Radius.circular(20),
+                                              bottomRight: Radius.circular(20),
+                                            )),
+                                        child: TextButton(
+                                          child: Text(
+                                            "Aceptar",
+                                            style: TextStyle(color: Colors.white),
+                                          ),
+                                          onPressed: () async {
+                                            await databaseService.cambiarParte(dataNoti["id_parte"], lista[index].id, dataNoti["parte_nuevo"], true);
+                                          },
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                SizedBox(
+                                  height: 12,
+                                ),
+                              ],
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+                  );
+                }
+                return Center(
+                  child: Text("Cargango"),
+                );
+              },
+            ));
+          }
+
           return CircularProgressIndicator();
         },
       ),
@@ -1037,6 +1338,103 @@ class _SubComandanteState extends State<SubComandante> {
   }
 }
 
+class _BuscarParte extends StatefulWidget {
+  _BuscarParte({Key? key, required this.lista}) : super(key: key);
+  List<dynamic> lista = [];
+  @override
+  _BuscarParteState createState() => _BuscarParteState();
+}
+
+class _BuscarParteState extends State<_BuscarParte> {
+  late List<dynamic> lista = widget.lista.sublist(0, 10);
+  late List<dynamic> listaTemporal = widget.lista;
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+        appBar: AppBar(
+            brightness: Brightness.dark,
+            backgroundColor: Colors.black12,
+            elevation: 0.0,
+            toolbarHeight: 70,
+            flexibleSpace: Container(
+              decoration: BoxDecoration(borderRadius: BorderRadius.only(bottomLeft: Radius.circular(20), bottomRight: Radius.circular(20)), gradient: LinearGradient(colors: [Colors.red, Colors.redAccent], begin: Alignment.bottomCenter, end: Alignment.topCenter)),
+            ),
+            title: Container(
+              height: 36,
+              child: TextField(
+                style: TextStyle(color: Colors.white),
+                cursorColor: Colors.white,
+                decoration: InputDecoration(
+                    fillColor: Colors.white,
+                    focusedBorder: OutlineInputBorder(
+                      borderSide: const BorderSide(color: Colors.white, width: 2.0),
+                      borderRadius: BorderRadius.circular(25.0),
+                    ),
+                    prefixIcon: Icon(Icons.search, color: Colors.white),
+                    border: OutlineInputBorder(
+                      borderSide: const BorderSide(color: Colors.white, width: 2.0),
+                      borderRadius: BorderRadius.circular(25.0),
+                    ),
+                    focusColor: Colors.white,
+                    hintStyle: TextStyle(fontWeight: FontWeight.w300, color: Colors.white)),
+                onChanged: (value) {
+                  if (value.toString().length == 0) {
+                    setState(() {
+                      lista = listaTemporal.sublist(0, 10);
+                    });
+                  } else {
+                    List<dynamic> listaTemp = listaTemporal.where((element) => element["apellidos"].toString().toLowerCase().contains(value.toString().toLowerCase())).toList();
+                    if (listaTemp.length > 10) {
+                      setState(() {
+                        lista = listaTemp.sublist(0, 10);
+                        ;
+                      });
+                    } else {
+                      setState(() {
+                        lista = listaTemp;
+                        ;
+                      });
+                    }
+                  }
+                },
+              ),
+            )),
+        body: SingleChildScrollView(
+            scrollDirection: Axis.vertical,
+            child: SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: DataTable(
+                dataRowHeight: 80,
+                dataTextStyle: TextStyle(fontSize: 12, color: Colors.black),
+                headingTextStyle: TextStyle(fontSize: 12, color: Colors.black, fontWeight: FontWeight.bold),
+                columns: <DataColumn>[
+                  DataColumn(label: Text('#')),
+                  DataColumn(label: Text('Grado')),
+                  DataColumn(label: Text('Apellidos\ny Nombres')),
+                  DataColumn(label: Text('Horario\nparte')),
+                  DataColumn(label: Text('Observacion')),
+                ],
+                rows: lista.map((e) {
+                  var index = lista.indexOf(e);
+                  return DataRow(cells: [
+                    DataCell(Text((index + 1).toString())),
+                    DataCell(Text(e["rango"])),
+                    DataCell(SizedBox(
+                      width: 100,
+                      child: Text(e["nombres"] + "\n" + e["apellidos"]),
+                    )),
+                    DataCell(Text(e["hora_registro"])),
+                    DataCell(
+                      Text(e["estado"]),
+                    ),
+                  ]);
+                }).toList(),
+              ),
+            )));
+  }
+}
+
 Stream<QuerySnapshot<Map<String, dynamic>>> devolverConsulta() {
   DateTime selectedDate = new DateTime.now();
   String desdeString = new DateFormat("dd-MM-yyyy").format(selectedDate);
@@ -1081,281 +1479,35 @@ Stream<QuerySnapshot<Map<String, dynamic>>> devolverConsulta() {
   return busqueda;
 }
 
-Widget Home(context, compania, hora) {
-  DateTime selectedDate = new DateTime.now();
-  String desdeString = new DateFormat("dd-MM-yyyy").format(selectedDate);
-
-  return SingleChildScrollView(
-    child: Column(crossAxisAlignment: CrossAxisAlignment.start, mainAxisAlignment: MainAxisAlignment.start, children: [
-      SizedBox(
-        height: 12,
-      ),
-      Container(
-        margin: EdgeInsets.only(left: 24),
-        child: label("Lista de registros", Colors.black, 18),
-      ),
-      StreamBuilder(
-        stream: FirebaseFirestore.instance.collection("partes").where("fechaRegistro", isEqualTo: desdeString).where("hora_registro", isEqualTo: hora).snapshots(),
-        builder: (context, AsyncSnapshot<QuerySnapshot<Map<String, dynamic>>> snapshot) {
-          if (!snapshot.hasData) {
-            return CircularProgressIndicator();
-          }
-          if (snapshot.connectionState == ConnectionState.active) {
-            List<dynamic> list = snapshot.data!.docs.map((DocumentSnapshot doc) {
-              return doc.data();
-            }).toList();
-            List<dynamic> listrep = [];
-            for (var i = 0; i < list.length; i++) {
-              if (listrep.length == 0) {
-                list[i]["contador"] = 1;
-                listrep.add(list[i]);
-              } else {
-                List<dynamic> lsi = listrep.where((element) => element["estado"] == list[i]["estado"]).toList();
-                if (!lsi.isEmpty) {
-                  int indexUpdate = listrep.indexWhere((element) => element["estado"] == list[i]["estado"]);
-
-                  int numero = listrep[indexUpdate]["contador"];
-
-                  listrep[indexUpdate]["contador"] = numero + 1;
-                } else {
-                  list[i]["contador"] = 1;
-                  listrep.add(list[i]);
-                }
-              }
-            }
-            //return Text("data");
-
-            return Container(
-                padding: EdgeInsets.only(left: 56, top: 12),
-                child: Column(children: [
-                  ListView.builder(
-                    shrinkWrap: true,
-                    itemCount: listrep.length,
-                    itemBuilder: (context, index) {
-                      return Container(
-                          padding: EdgeInsets.only(top: 10),
-                          child: Column(
-                            mainAxisSize: MainAxisSize.max,
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            mainAxisAlignment: MainAxisAlignment.start,
-                            children: [
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Container(
-                                    child: label(listrep[index]["estado"], Colors.black, 16),
-                                  ),
-                                  Container(
-                                    width: 100,
-                                    child: label((listrep[index]["contador"]).toString(), Colors.black, 15),
-                                  ),
-                                ],
-                              )
-                            ],
-                          ));
-                    },
-                  ),
-                ]));
-          }
-          return Center(
-            child: Text("Sin registros"),
-          );
-        },
-      ),
-      StreamBuilder(
-        stream: FirebaseFirestore.instance.collection("partes").where("fechaRegistro", isEqualTo: desdeString).where("hora_registro", isEqualTo: hora).snapshots(),
-        builder: (context, AsyncSnapshot<QuerySnapshot<Map<String, dynamic>>> snapshot) {
-          if (!snapshot.hasData) {
-            return CircularProgressIndicator();
-          }
-          if (snapshot.connectionState == ConnectionState.active) {
-            List<dynamic> list = snapshot.data!.docs.map((DocumentSnapshot doc) {
-              return doc.data();
-            }).toList();
-            List<dynamic> listrep = [];
-            for (var i = 0; i < list.length; i++) {
-              if (listrep.length == 0) {
-                listrep.add(list[i]);
-              } else {
-                List<dynamic> lsi = listrep.where((element) => element["estado"] == list[i]["estado"]).toList();
-                if (!lsi.isEmpty) {
-                  int indexUpdate = listrep.indexWhere((element) => element["estado"] == list[i]["estado"]);
-                  listrep[indexUpdate]["contador"] = lsi.length + 1;
-                } else {
-                  listrep.add(list[i]);
-                }
-              }
-            }
-            //return Text("data");
-
-            return SingleChildScrollView(
-                scrollDirection: Axis.horizontal,
-                child: Container(
-                    padding: EdgeInsets.only(top: 12),
-                    child: Container(
-                      child: DataTable(
-                        dataTextStyle: TextStyle(fontSize: 12, color: Colors.black),
-                        headingTextStyle: TextStyle(fontSize: 12, color: Colors.black, fontWeight: FontWeight.bold),
-                        columns: const <DataColumn>[
-                          DataColumn(label: Text('#')),
-                          DataColumn(label: Text('Grado')),
-                          DataColumn(label: Text('Apellidos\ny Nombres')),
-                          DataColumn(label: Text('Horario\nparte')),
-                          DataColumn(label: Text('Observacion')),
-                        ],
-                        rows: list.map((e) {
-                          var index = list.indexOf(e);
-                          return DataRow(cells: [
-                            DataCell(Text((index + 1).toString())),
-                            DataCell(Text(e["rango"])),
-                            DataCell(Text(e["nombres"] + "\n" + e["apellidos"])),
-                            DataCell(Text(e["hora_registro"])),
-                            DataCell(
-                              Text(e["estado"]),
-                            ),
-                          ]);
-                        }).toList(),
-                      ),
-                    )));
-          }
-          return Center(
-            child: Text("Sin registros"),
-          );
-        },
-      ),
-    ]),
-  );
-}
-
-Widget Notificaciones(context, databaseService) {
-  return SingleChildScrollView(
-      child: StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
-    stream: databaseService.notificacionesExistentes(),
-    builder: (context, snapshot) {
-      if (!snapshot.hasData) {
-        return Center(
-          child: Text("Cargango"),
-        );
+List<dynamic> filtrarLista(List<dynamic> lista) {
+  List<String> listaOrden = [
+    "GRAE",
+    "GRAD",
+    "GRAB",
+    "CRNL",
+    "TCRN",
+    "MAYO",
+    "CAPT",
+    "TNTE",
+    "SUBT",
+    "SUBM",
+    "SUBP",
+    "SUBS",
+    "SGOP",
+    "SGOS",
+    "CBOP",
+    "CBOS",
+    "SLDO",
+  ];
+  List<dynamic> listaFilter = [];
+  for (var item in listaOrden) {
+    for (var itemParte in lista) {
+      if (itemParte["rango"] == item) {
+        listaFilter.add(itemParte);
       }
-      if (snapshot.connectionState == ConnectionState.active && snapshot.hasData) {
-        List<QueryDocumentSnapshot<Map<String, dynamic>>> lista = snapshot.data!.docs;
-
-        return SizedBox(
-          height: MediaQuery.of(context).size.height,
-          width: MediaQuery.of(context).size.width,
-          child: ListView.builder(
-            shrinkWrap: true,
-            itemCount: lista.length,
-            itemBuilder: (context, index) {
-              Map<String, dynamic> dataNoti = lista[index].data();
-
-              return Card(
-                child: Container(
-                  padding: EdgeInsets.all(8),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    mainAxisSize: MainAxisSize.min,
-                    children: <Widget>[
-                      ListTile(
-                        title: Text(dataNoti["name"].toString()),
-                        subtitle: Text(dataNoti["subject"].toString()),
-                      ),
-                      SizedBox(
-                        height: 12,
-                      ),
-                      Container(
-                        padding: EdgeInsets.only(left: 16),
-                        child: Text("Parte anterior: " + dataNoti["parte_anterior"]),
-                      ),
-                      SizedBox(
-                        height: 12,
-                      ),
-                      Container(
-                        padding: EdgeInsets.only(left: 16),
-                        child: Text("Parte Actual: " + dataNoti["parte_nuevo"]),
-                      ),
-                      SizedBox(
-                        height: 16,
-                      ),
-                      if (dataNoti["estado"] == "aceptado")
-                        Container(
-                          margin: EdgeInsets.only(bottom: 12),
-                          padding: EdgeInsets.only(left: 16),
-                          child: Text("Cambio de parte aceptado"),
-                        ),
-                      if (dataNoti["estado"] == "en_espera")
-                        Container(
-                          margin: EdgeInsets.only(bottom: 12),
-                          padding: EdgeInsets.only(left: 16),
-                          child: Text("Cambio de estado a la espera de respuesta"),
-                        ),
-                      if (dataNoti["estado"] == "rechazado")
-                        Container(
-                          margin: EdgeInsets.only(bottom: 12),
-                          padding: EdgeInsets.only(left: 16),
-                          child: Text("Cambio de parte rechazado"),
-                        ),
-                      if (dataNoti["atendido"] == false)
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                          children: [
-                            Container(
-                              width: 100,
-                              height: 32,
-                              decoration: BoxDecoration(
-                                  color: Colors.blueGrey,
-                                  borderRadius: BorderRadius.only(
-                                    topLeft: Radius.circular(20),
-                                    bottomRight: Radius.circular(20),
-                                  )),
-                              child: TextButton(
-                                child: Text(
-                                  "Rechazar",
-                                  style: TextStyle(color: Colors.white),
-                                ),
-                                onPressed: () async {
-                                  await databaseService.cambiarParte(dataNoti["id_parte"], lista[index].id, dataNoti["parte_anterior"], false);
-                                },
-                              ),
-                            ),
-                            Container(
-                              width: 100,
-                              height: 32,
-                              decoration: BoxDecoration(
-                                  color: Color.fromRGBO(218, 0, 55, 1),
-                                  borderRadius: BorderRadius.only(
-                                    topLeft: Radius.circular(20),
-                                    bottomRight: Radius.circular(20),
-                                  )),
-                              child: TextButton(
-                                child: Text(
-                                  "Aceptar",
-                                  style: TextStyle(color: Colors.white),
-                                ),
-                                onPressed: () async {
-                                  await databaseService.cambiarParte(dataNoti["id_parte"], lista[index].id, dataNoti["parte_nuevo"], true);
-                                },
-                              ),
-                            ),
-                          ],
-                        ),
-                      SizedBox(
-                        height: 12,
-                      ),
-                    ],
-                  ),
-                ),
-              );
-            },
-          ),
-        );
-      }
-      return Center(
-        child: Text("Cargango"),
-      );
-    },
-  ));
+    }
+  }
+  return listaFilter;
 }
 
 Future<void> main() async {}

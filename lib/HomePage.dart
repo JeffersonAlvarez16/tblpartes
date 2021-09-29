@@ -5,14 +5,9 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:tblpartes/AutenticationWraper.dart';
-import 'package:tblpartes/models/user.dart';
 import 'package:tblpartes/screens/autenticate/sign_in.dart';
 import 'package:tblpartes/screens/home/administrador.dart';
-import 'package:tblpartes/screens/home/comandante.dart';
-import 'package:tblpartes/screens/home/oficial_semana.dart';
-import 'package:tblpartes/screens/home/person.dart';
 import 'package:tblpartes/screens/home/personal.dart';
-import 'package:tblpartes/screens/home/sub_comandante.dart';
 import 'package:tblpartes/services/auntentication.dart';
 
 class HomePage extends StatelessWidget {
@@ -41,9 +36,9 @@ class HomePage extends StatelessWidget {
         if (snapshot.connectionState == ConnectionState.active) {
           if (snapshot.hasData) {
             User? data = snapshot.data;
-            print(data!.uid);
+
             return StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
-                stream: FirebaseFirestore.instance.collection("users").where("uid_user", isEqualTo: data.uid).snapshots(),
+                stream: FirebaseFirestore.instance.collection("users").where("uid_user", isEqualTo: data!.uid).snapshots(),
                 builder: (context, AsyncSnapshot<QuerySnapshot<Map<String, dynamic>>> snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {
                     return Center(
@@ -61,7 +56,6 @@ class HomePage extends StatelessWidget {
                     );
                   }
                   if (snapshot.hasData && snapshot.connectionState == ConnectionState.active) {
-                    print(snapshot.data!.size);
                     if (snapshot.data!.size == 0) {
                       return Personal();
                     }
@@ -77,7 +71,7 @@ class HomePage extends StatelessWidget {
                       'Sub comandante',
                       'Comandante',
                     ]; */
-                    print(typeUser);
+
                     if (typeUser == "Comandante") {
                       String compania = personal["compania"] ?? "";
                       contexta.read<Autentication>().changeUserData(compania);

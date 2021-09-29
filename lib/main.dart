@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:provider/provider.dart';
 import 'package:tblpartes/AutenticationWraper.dart';
@@ -18,6 +19,10 @@ import 'package:tblpartes/services/auntentication.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await SystemChrome.setPreferredOrientations([
+    DeviceOrientation.portraitUp,
+    DeviceOrientation.portraitDown,
+  ]);
   await Firebase.initializeApp();
 
   try {
@@ -50,13 +55,6 @@ class App extends StatefulWidget {
 
   @override
   _AppState createState() => _AppState();
-}
-
-class ScreenArguments {
-  final String title;
-  final String message;
-
-  ScreenArguments(this.title, this.message);
 }
 
 class _AppState extends State<App> {
@@ -115,41 +113,9 @@ class AuthenticationWrapper extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final firebaseUser = context.watch<User?>();
-
     if (firebaseUser != null) {
       return HomePage();
     }
     return SignIn();
   }
-}
-
-Widget Carga() {
-  return Scaffold(
-    body: Container(
-      width: Medidas.width(100),
-      height: Medidas.heigth(100),
-      color: Color.fromRGBO(218, 0, 55, 1),
-      child: Center(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            label("Cargando Datos", Colors.white, 18),
-            SizedBox(
-              height: 8,
-            ),
-            CircularProgressIndicator()
-          ],
-        ),
-      ),
-    ),
-  );
-}
-
-Widget label(String text, Color color, double size) {
-  return Text(
-    text,
-    textAlign: TextAlign.center,
-    style: TextStyle(color: color, fontSize: size > 14 ? size : 14, fontFamily: "Lato", fontWeight: FontWeight.bold),
-  );
 }
