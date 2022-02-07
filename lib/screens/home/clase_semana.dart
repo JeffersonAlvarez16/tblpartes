@@ -1337,12 +1337,10 @@ class _RegistroParteState extends State<_RegistroParte> {
 
                 final snackBar = SnackBar(content: Text('Se elimino el usuario correctamente'));
                 ScaffoldMessenger.of(context).showSnackBar(snackBar);
-
-                // Muestra un snackbar! Este snackbar tambien podría contener acciones "Undo".
               },
               child: ListTile(
                   title: Text(
-                index.toString() + "" + listaTemporal[index]["grado"] + " → " + listaTemporal[index]["nombres"] + " " + listaTemporal[index]["apellidos"],
+                listaTemporal[index]["grado"] + " → " + listaTemporal[index]["nombres"] + " " + listaTemporal[index]["apellidos"],
                 style: TextStyle(color: Colors.black87, fontSize: 14, fontFamily: "Lato", fontWeight: FontWeight.bold),
               ))),
           onTap: () {
