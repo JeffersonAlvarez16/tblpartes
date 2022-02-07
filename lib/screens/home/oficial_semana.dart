@@ -437,6 +437,7 @@ class _OficialSemanaState extends State<OficialSemana> {
                           padding: EdgeInsets.only(left: 56, top: 12),
                           child: Column(children: [
                             ListView.builder(
+                              physics: NeverScrollableScrollPhysics(),
                               shrinkWrap: true,
                               itemCount: listrep.length,
                               itemBuilder: (context, index) {
@@ -1187,6 +1188,7 @@ class _OficialSemanaState extends State<OficialSemana> {
           ),
         ),
         actions: <Widget>[
+          label("Versión 1.5", Colors.white, 9),
           TextButton.icon(
             icon: Icon(
               Icons.logout_outlined,
@@ -1285,7 +1287,10 @@ class _BuscarParteState extends State<_BuscarParte> {
                   DataColumn(label: Text('Grado')),
                   DataColumn(label: Text('Apellidos\ny Nombres')),
                   DataColumn(label: Text('Horario\nparte')),
-                  DataColumn(label: Text('Observacion')),
+                  DataColumn(label: Text('Estado')),
+                  DataColumn(label: Text('Observación')),
+                  DataColumn(label: Text('Desde')),
+                  DataColumn(label: Text('Hasta')),
                 ],
                 rows: lista.map((e) {
                   var index = lista.indexOf(e);
@@ -1299,6 +1304,15 @@ class _BuscarParteState extends State<_BuscarParte> {
                     DataCell(Text(e["hora_registro"])),
                     DataCell(
                       Text(e["estado"]),
+                    ),
+                    DataCell(
+                      Text(e["nota"] ?? ""),
+                    ),
+                    DataCell(
+                      Text(e["desde"] ?? ""),
+                    ),
+                    DataCell(
+                      Text(e["hasta"] ?? ""),
                     ),
                   ]);
                 }).toList(),
@@ -1345,7 +1359,7 @@ Widget Notificaciones(context, databaseService) {
     builder: (context, snapshot) {
       if (!snapshot.hasData) {
         return Center(
-          child: Text("Cargango"),
+          child: Text("Cargando"),
         );
       }
       if (snapshot.connectionState == ConnectionState.active && snapshot.hasData) {
@@ -1385,6 +1399,13 @@ Widget Notificaciones(context, databaseService) {
                       Container(
                         padding: EdgeInsets.only(left: 16),
                         child: Text("Parte Actual: " + dataNoti["parte_nuevo"]),
+                      ),
+                      SizedBox(
+                        height: 12,
+                      ),
+                      Container(
+                        padding: EdgeInsets.only(left: 16),
+                        child: Text("Nota: " + (dataNoti["nota"].toString() == "null" ? "" : dataNoti["nota"].toString())),
                       ),
                       SizedBox(
                         height: 16,
@@ -1463,7 +1484,7 @@ Widget Notificaciones(context, databaseService) {
         );
       }
       return Center(
-        child: Text("Cargango"),
+        child: Text("Cargando"),
       );
     },
   ));

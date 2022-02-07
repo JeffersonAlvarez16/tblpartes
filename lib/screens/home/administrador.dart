@@ -43,6 +43,7 @@ class _AdministradorState extends State<Administrador> {
             ),
           ),
           actions: <Widget>[
+            label("Versión 1.5", Colors.white, 9),
             TextButton.icon(
               icon: Icon(
                 Icons.logout,

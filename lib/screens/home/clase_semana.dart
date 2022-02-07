@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 import 'dart:typed_data';
 
 import 'package:badges/badges.dart';
@@ -12,8 +13,12 @@ import 'package:image_gallery_saver/image_gallery_saver.dart';
 import 'package:intl/intl.dart';
 import 'package:pdf/pdf.dart';
 import 'package:provider/provider.dart';
+import 'package:tblpartes/models/estados.dart';
+import 'package:tblpartes/models/user.dart';
+import 'package:tblpartes/screens/home/asignar_parte.dart';
 import 'package:tblpartes/screens/home/comandante.dart';
 import 'package:tblpartes/screens/home/personal.dart';
+import 'package:tblpartes/screens/listas/estadoparte.dart';
 import 'package:tblpartes/services/Constantes.dart';
 import 'package:tblpartes/services/auntentication.dart';
 import 'package:pdf/widgets.dart' as pw;
@@ -453,6 +458,7 @@ class _ClaseSemanaState extends State<ClaseSemana> {
                           child: Column(children: [
                             ListView.builder(
                               shrinkWrap: true,
+                              physics: NeverScrollableScrollPhysics(),
                               itemCount: listrep.length,
                               itemBuilder: (context, index) {
                                 return Container(
@@ -927,6 +933,45 @@ class _ClaseSemanaState extends State<ClaseSemana> {
               )
             ])),
       ),
+      StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
+          stream: FirebaseFirestore.instance.collection("personal").where("compania", isEqualTo: widget.arguments["compania"]).snapshots(),
+          builder: (context, AsyncSnapshot<QuerySnapshot<Map<String, dynamic>>> snapshot) {
+            if (!snapshot.hasData) {
+              return Scaffold(
+                  body: Center(
+                child: Column(
+                  children: [Text("Cargando dato"), CircularProgressIndicator()],
+                ),
+              ));
+            }
+            if (snapshot.hasData && snapshot.connectionState == ConnectionState.active) {
+              print(snapshot.data);
+              List<Map<String, dynamic>> data = snapshot.data!.docs.map((e) => e.data()).toList();
+              List<dynamic> list = snapshot.data!.docs.map((DocumentSnapshot doc) {
+                return doc.data();
+              }).toList();
+              print(data);
+              return Stack(
+                children: [
+                  SingleChildScrollView(
+                    child: Container(width: MediaQuery.of(context).size.width, height: MediaQuery.of(context).size.height, child: _RegistroParte(lista: list)),
+                  ),
+                  Container(
+                    width: MediaQuery.of(context).size.width,
+                    padding: EdgeInsets.all(12),
+                    color: Colors.white,
+                    child: Text("Lista de personal de la: " + '"' + widget.arguments["compania"].toString() + '"' + " → Total = " + data.length.toString()),
+                  ),
+                ],
+              );
+            }
+            return Scaffold(
+                body: Center(
+              child: Column(
+                children: [Text("Cargando dato"), CircularProgressIndicator()],
+              ),
+            ));
+          }),
     ];
 
     void _onItemTapped(int index) {
@@ -952,6 +997,10 @@ class _ClaseSemanaState extends State<ClaseSemana> {
             icon: Icon(Icons.book),
             label: 'Reportes',
           ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.book),
+            label: 'Registrar Estados',
+          ),
         ],
         currentIndex: _selectedIndex,
         selectedItemColor: Colors.amber[800],
@@ -974,7 +1023,8 @@ class _ClaseSemanaState extends State<ClaseSemana> {
                 'Clase de semana',
                 style: TextStyle(fontFamily: "Lato", fontWeight: FontWeight.bold, color: Colors.white),
               ),
-              label(widget.arguments["compania"], Colors.white, 10)
+              label(widget.arguments["compania"], Colors.white, 10),
+              label("Versión 1.5", Colors.white, 9),
             ],
           ),
         ),
@@ -1082,7 +1132,10 @@ class _BuscarParteState extends State<_BuscarParte> {
                   DataColumn(label: Text('Grado')),
                   DataColumn(label: Text('Apellidos\ny Nombres')),
                   DataColumn(label: Text('Horario\nparte')),
-                  DataColumn(label: Text('Observacion')),
+                  DataColumn(label: Text('Estado')),
+                  DataColumn(label: Text('Observación')),
+                  DataColumn(label: Text('Desde')),
+                  DataColumn(label: Text('Hasta')),
                 ],
                 rows: lista.map((e) {
                   var index = lista.indexOf(e);
@@ -1096,6 +1149,15 @@ class _BuscarParteState extends State<_BuscarParte> {
                     DataCell(Text(e["hora_registro"])),
                     DataCell(
                       Text(e["estado"]),
+                    ),
+                    DataCell(
+                      Text(e["nota"] ?? ""),
+                    ),
+                    DataCell(
+                      Text(e["desde"] ?? ""),
+                    ),
+                    DataCell(
+                      Text(e["hasta"] ?? ""),
                     ),
                   ]);
                 }).toList(),
@@ -1170,4 +1232,135 @@ Widget CardGrid(String title, dynamic onTap) {
         )),
     onTap: onTap,
   );
+}
+
+class _RegistroParte extends StatefulWidget {
+  _RegistroParte({Key? key, required this.lista}) : super(key: key);
+  List<dynamic> lista = [];
+  @override
+  _RegistroParteState createState() => _RegistroParteState();
+}
+
+List<dynamic> filtrarListaGrado(List<dynamic> lista) {
+  List<String> listaOrden = [
+    "GRAE",
+    "GRAD",
+    "GRAB",
+    "CRNL",
+    "TCRN",
+    "MAYO",
+    "CAPT",
+    "TNTE",
+    "SUBT",
+    "SUBM",
+    "SUBP",
+    "SUBS",
+    "SGOP",
+    "SGOS",
+    "CBOP",
+    "CBOS",
+    "SLDO",
+  ];
+  List<dynamic> listaFilter = [];
+  for (var item in listaOrden) {
+    for (var itemParte in lista) {
+      if (itemParte["grado"] == item) {
+        listaFilter.add(itemParte);
+      }
+    }
+  }
+  return listaFilter;
+}
+
+class _RegistroParteState extends State<_RegistroParte> {
+  late List<dynamic> listaTemporal = filtrarListaGrado(widget.lista);
+  StreamServices streamServices = new StreamServices();
+  String horaParte = "";
+  @override
+  void initState() {
+    streamServices.horariosStringTrue.listen((event) {
+      setState(() {
+        horaParte = event.first;
+      });
+    });
+
+    // TODO: implement initState
+    super.initState();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return ListView.builder(
+      padding: EdgeInsets.only(top: 45, bottom: 200),
+      itemCount: listaTemporal.length,
+      itemBuilder: (context, index) {
+        return InkWell(
+          child: Dismissible(
+              confirmDismiss: (DismissDirection direction) async {
+                return await showDialog(
+                  context: context,
+                  builder: (BuildContext context) {
+                    return AlertDialog(
+                      title: Text(
+                        "Desea eliminar el usuario:",
+                        style: TextStyle(fontFamily: "Lato", fontSize: 18, color: Colors.black54, fontWeight: FontWeight.bold),
+                      ),
+                      content: Text(
+                        listaTemporal[index].nombres + "?",
+                        style: TextStyle(fontFamily: "Lato", fontSize: 15, fontWeight: FontWeight.bold),
+                      ),
+                      actions: <Widget>[
+                        TextButton(
+                          onPressed: () => Navigator.of(context).pop(false),
+                          child: const Text("Cancelar", style: TextStyle(fontFamily: "Lato", fontSize: 14, fontWeight: FontWeight.bold, color: Color.fromRGBO(218, 0, 55, 1))),
+                        ),
+                        TextButton(
+                            onPressed: () => Navigator.of(context).pop(true),
+                            child: const Text("Eliminar",
+                                style: TextStyle(
+                                  fontFamily: "Lato",
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.bold,
+                                ))),
+                      ],
+                    );
+                  },
+                );
+              },
+              // Cada Dismissible debe contener una llave. Las llaves permiten a Flutter
+              // identificar de manera única los Widgets.
+              key: Key(listaTemporal[index]["nombres"]),
+              // También debemos proporcionar una función que diga a nuestra aplicación
+              // qué hacer después de que un elemento ha sido eliminado.
+              onDismissed: (direction) async {
+                // Remueve el elemento de nuestro data source.
+
+                final snackBar = SnackBar(content: Text('Se elimino el usuario correctamente'));
+                ScaffoldMessenger.of(context).showSnackBar(snackBar);
+
+                // Muestra un snackbar! Este snackbar tambien podría contener acciones "Undo".
+              },
+              child: ListTile(
+                  title: Text(
+                index.toString() + "" + listaTemporal[index]["grado"] + " → " + listaTemporal[index]["nombres"] + " " + listaTemporal[index]["apellidos"],
+                style: TextStyle(color: Colors.black87, fontSize: 14, fontFamily: "Lato", fontWeight: FontWeight.bold),
+              ))),
+          onTap: () {
+            late UserModel userModel = new UserModel(uid: "");
+            userModel = new UserModel.fromUserModel(uid: listaTemporal[index]["uid"], hasta: listaTemporal[index]["hasta"] ?? "", token: listaTemporal[index]["token"] ?? "", apellidos: listaTemporal[index]["apellidos"], grado: listaTemporal[index]["grado"], nombres: listaTemporal[index]["nombres"], batallon: listaTemporal[index]["batallon"], compania: listaTemporal[index]["compania"], cedula: listaTemporal[index]["cedula"], email: listaTemporal[index]["email"], typeUser: "typeUser", estado: listaTemporal[index]["estado"]);
+
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) {
+                return AsignarParte(
+                  usuario: userModel,
+                  horaParte: horaParte,
+                );
+              }),
+            );
+          },
+        );
+      },
+    );
+  }
 }

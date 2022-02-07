@@ -438,6 +438,7 @@ class _SubComandanteState extends State<SubComandante> {
                           child: Column(children: [
                             ListView.builder(
                               shrinkWrap: true,
+                              physics: NeverScrollableScrollPhysics(),
                               itemCount: listrep.length,
                               itemBuilder: (context, index) {
                                 return Container(
@@ -481,6 +482,22 @@ class _SubComandanteState extends State<SubComandante> {
                   builder: (context, snapshot) {
                     List<dynamic>? lt = snapshot.data;
                     if (snapshot.hasData) {
+                      List<DataRow> listaTabla = [];
+                      for (var i = 0; i < lt!.length; i++) {
+                        listaTabla.add(DataRow(cells: [
+                          DataCell(Text((i + 1).toString())),
+                          DataCell(Text(lt[i]["rango"].toString())),
+                          DataCell(SizedBox(
+                            width: 100,
+                            child: Text(lt[i]["nombres"] + "\n" + lt[i]["apellidos"]),
+                          )),
+                          DataCell(Text(lt[i]["hora_registro"].toString())),
+                          DataCell(Text(lt[i]["estado"].toString())),
+                          DataCell(Text(lt[i]["nota"].toString())),
+                          DataCell(Text(lt[i]["desde"].toString())),
+                          DataCell(Text(lt[i]["hasta"].toString()))
+                        ]));
+                      }
                       return SingleChildScrollView(
                         scrollDirection: Axis.horizontal,
                         child: DataTable(
@@ -492,23 +509,12 @@ class _SubComandanteState extends State<SubComandante> {
                             DataColumn(label: Text('Grado')),
                             DataColumn(label: Text('Apellidos\ny Nombres')),
                             DataColumn(label: Text('Horario\nparte')),
-                            DataColumn(label: Text('Observacion')),
+                            DataColumn(label: Text('Estado')),
+                            DataColumn(label: Text('Observación')),
+                            DataColumn(label: Text('Desde')),
+                            DataColumn(label: Text('Hasta')),
                           ],
-                          rows: lt!.map((e) {
-                            var index = lt.indexOf(e);
-                            return DataRow(cells: [
-                              DataCell(Text((index + 1).toString())),
-                              DataCell(Text(e["rango"])),
-                              DataCell(SizedBox(
-                                width: 100,
-                                child: Text(e["nombres"] + "\n" + e["apellidos"]),
-                              )),
-                              DataCell(Text(e["hora_registro"])),
-                              DataCell(
-                                Text(e["estado"]),
-                              ),
-                            ]);
-                          }).toList(),
+                          rows: listaTabla,
                         ),
                       );
                     }
@@ -527,7 +533,7 @@ class _SubComandanteState extends State<SubComandante> {
               builder: (context, snapshot) {
                 if (!snapshot.hasData) {
                   return Center(
-                    child: Text("Cargango"),
+                    child: Text("Cargando"),
                   );
                 }
                 if (snapshot.connectionState == ConnectionState.active && snapshot.hasData) {
@@ -567,6 +573,13 @@ class _SubComandanteState extends State<SubComandante> {
                                 Container(
                                   padding: EdgeInsets.only(left: 16),
                                   child: Text("Parte Actual: " + dataNoti["parte_nuevo"]),
+                                ),
+                                SizedBox(
+                                  height: 12,
+                                ),
+                                Container(
+                                  padding: EdgeInsets.only(left: 16),
+                                  child: Text("Nota: " + (dataNoti["nota"].toString() == "null" ? "" : dataNoti["nota"].toString())),
                                 ),
                                 SizedBox(
                                   height: 16,
@@ -645,7 +658,7 @@ class _SubComandanteState extends State<SubComandante> {
                   );
                 }
                 return Center(
-                  child: Text("Cargango"),
+                  child: Text("Cargando"),
                 );
               },
             ));
@@ -1306,6 +1319,7 @@ class _SubComandanteState extends State<SubComandante> {
                 'Sub comandante',
                 style: TextStyle(fontFamily: "Lato", fontWeight: FontWeight.bold, color: Colors.white),
               ),
+              label("Versión 1.5", Colors.white, 9),
             ],
           ),
         ),

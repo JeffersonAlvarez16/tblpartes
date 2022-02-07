@@ -17,26 +17,16 @@ import 'package:tblpartes/services/database.dart';
 import 'package:tblpartes/services/streams.dart';
 import 'package:firebase_core/firebase_core.dart';
 
-const AndroidNotificationChannel channel = AndroidNotificationChannel(
-    'high_importance_channel', // id
-    'High Importance Notifications', // title
-    'This channel is used for important notifications.', // description
-    importance: Importance.high,
-    playSound: true);
-
-final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
-Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
-  await Firebase.initializeApp();
-}
-
-class Personal extends StatefulWidget {
-  Personal({Key? key}) : super(key: key);
+class AsignarParte extends StatefulWidget {
+  final UserModel usuario;
+  final String horaParte;
+  AsignarParte({Key? key, required this.usuario, required this.horaParte}) : super(key: key);
 
   @override
-  _PersonalState createState() => _PersonalState();
+  _AsignarParteState createState() => _AsignarParteState();
 }
 
-class _PersonalState extends State<Personal> {
+class _AsignarParteState extends State<AsignarParte> {
   String? token = '';
   late FirebaseMessaging firebaseMessaging = FirebaseMessaging.instance;
   StreamServices streamServices = new StreamServices();
@@ -53,64 +43,12 @@ class _PersonalState extends State<Personal> {
     getToken();
     // TODO: implement initState
 
-    FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
-    FirebaseMessaging.onMessage.listen((RemoteMessage message) {
-      RemoteNotification? notification = message.notification;
-      AndroidNotification? android = message.notification?.android;
-      if (notification != null && android != null) {
-        flutterLocalNotificationsPlugin.show(
-            notification.hashCode,
-            notification.title,
-            notification.body,
-            NotificationDetails(
-              android: AndroidNotificationDetails(
-                channel.id,
-                channel.name,
-                channel.description,
-                color: Colors.blue,
-                playSound: true,
-                icon: '@mipmap/logo',
-              ),
-            ));
-      }
-    });
-
-    FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
-      RemoteNotification? notification = message.notification;
-      AndroidNotification? android = message.notification?.android;
-      if (notification != null && android != null) {
-        showDialog(
-            context: context,
-            builder: (_) {
-              return AlertDialog(
-                title: Text(notification.title.toString()),
-                content: SingleChildScrollView(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [Text(notification.body.toString())],
-                  ),
-                ),
-              );
-            });
-      }
-    });
-    showNotification();
     streamServices.horariosStringTrue.listen((event) {
       setState(() {
         horaParte = event.first;
       });
     });
     super.initState();
-  }
-
-  void showNotification() async {
-    await flutterLocalNotificationsPlugin.resolvePlatformSpecificImplementation<AndroidFlutterLocalNotificationsPlugin>()?.createNotificationChannel(channel);
-
-    await FirebaseMessaging.instance.setForegroundNotificationPresentationOptions(
-      alert: true,
-      badge: true,
-      sound: true,
-    );
   }
 
   DatabaseService databaseService = new DatabaseService();
@@ -133,7 +71,7 @@ class _PersonalState extends State<Personal> {
               User? data = snapshot.data;
               String userUIs = data!.uid;
               return StreamBuilder(
-                  stream: FirebaseFirestore.instance.collection("personal").doc(userUIs).snapshots(),
+                  stream: FirebaseFirestore.instance.collection("personal").doc(widget.usuario.uid).snapshots(),
                   builder: (context, AsyncSnapshot snapshot) {
                     if (!snapshot.hasData) {
                       return Center(
@@ -141,9 +79,9 @@ class _PersonalState extends State<Personal> {
                       );
                     }
                     String json = jsonEncode(snapshot.data!.data());
-                    Map<String, dynamic> personal = jsonDecode(json);
+                    Map<String, dynamic> AsignarParte = jsonDecode(json);
 
-                    userModel = new UserModel.fromUserModel(uid: personal["uid"], hasta: personal["hasta"] ?? "", token: personal["token"] ?? "", apellidos: personal["apellidos"], grado: personal["grado"], nombres: personal["nombres"], batallon: personal["batallon"], compania: personal["compania"], cedula: personal["cedula"], email: personal["email"], typeUser: "typeUser", estado: personal["estado"]);
+                    userModel = new UserModel.fromUserModel(uid: AsignarParte["uid"], hasta: AsignarParte["hasta"] ?? "", token: AsignarParte["token"] ?? "", apellidos: AsignarParte["apellidos"], grado: AsignarParte["grado"], nombres: AsignarParte["nombres"], batallon: AsignarParte["batallon"], compania: AsignarParte["compania"], cedula: AsignarParte["cedula"], email: AsignarParte["email"], typeUser: "typeUser", estado: AsignarParte["estado"]);
                     return SingleChildScrollView(
                         padding: EdgeInsets.all(24),
                         child: Column(crossAxisAlignment: CrossAxisAlignment.start, mainAxisAlignment: MainAxisAlignment.start, mainAxisSize: MainAxisSize.max, children: [
@@ -182,23 +120,23 @@ class _PersonalState extends State<Personal> {
                                   mainAxisAlignment: MainAxisAlignment.start,
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    label(personal["grado"], Colors.black, 18),
+                                    label(widget.usuario.grado, Colors.black, 18),
                                     SizedBox(
                                       height: 8,
                                     ),
-                                    label(personal["apellidos"], Colors.black, 18),
+                                    label(widget.usuario.apellidos, Colors.black, 18),
                                     SizedBox(
                                       height: 8,
                                     ),
-                                    label(personal["nombres"], Colors.black, 18),
+                                    label(widget.usuario.nombres, Colors.black, 18),
                                     SizedBox(
                                       height: 8,
                                     ),
-                                    label(personal["compania"], Colors.black, 18),
+                                    label(widget.usuario.compania, Colors.black, 18),
                                     SizedBox(
                                       height: 8,
                                     ),
-                                    label(personal["estado"], Colors.black, 18),
+                                    label(widget.usuario.estado, Colors.black, 18),
                                     SizedBox(
                                       height: 8,
                                     ),
@@ -280,40 +218,6 @@ class _PersonalState extends State<Personal> {
     }
 
     return Scaffold(
-        bottomNavigationBar: BottomNavigationBar(
-          backgroundColor: Colors.white54,
-          type: BottomNavigationBarType.fixed,
-          items: <BottomNavigationBarItem>[
-            BottomNavigationBarItem(
-              icon: Icon(Icons.home),
-              label: 'Inicio',
-            ),
-            BottomNavigationBarItem(
-              icon: Badge(
-                badgeContent: StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
-                  stream: databaseService.notificacionesExistentesUser(),
-                  builder: (context, snapshot) {
-                    if (!snapshot.hasData) {
-                      return Text('...');
-                    }
-                    if (snapshot.connectionState == ConnectionState.active && snapshot.hasData) {
-                      List<QueryDocumentSnapshot<Map<String, dynamic>>> lista = snapshot.data!.docs;
-                      lista.removeWhere((element) => element["atendido"] == true);
-                      return Text(lista.length.toString());
-                    }
-
-                    return Text('...');
-                  },
-                ),
-                child: Icon(Icons.settings),
-              ),
-              label: 'Notificaciones',
-            ),
-          ],
-          currentIndex: _selectedIndex,
-          selectedItemColor: Colors.amber[800],
-          onTap: _onItemTapped,
-        ),
         appBar: AppBar(
           brightness: Brightness.dark,
           backgroundColor: Colors.black12,
@@ -323,31 +227,14 @@ class _PersonalState extends State<Personal> {
             decoration: BoxDecoration(borderRadius: BorderRadius.only(bottomLeft: Radius.circular(20), bottomRight: Radius.circular(20)), gradient: LinearGradient(colors: [Colors.red, Colors.red.shade900], begin: Alignment.bottomCenter, end: Alignment.topCenter)),
           ),
           title: Text(
-            'Personal',
+            'AsignarParte',
             style: TextStyle(fontFamily: "Lato", fontWeight: FontWeight.w900, color: Colors.white),
           ),
-          leading: IconButton(
-            onPressed: () {},
-            icon: Image.asset(
-              'assets/img/logo.png',
-              width: 100.0,
-              height: 100.0,
-            ),
+          leading: BackButton(
+            onPressed: () {
+              Navigator.pop(context);
+            },
           ),
-          actions: <Widget>[
-            label("Versión 1.5", Colors.white, 9),
-            TextButton.icon(
-              icon: Icon(
-                Icons.logout_outlined,
-                color: Colors.black,
-              ),
-              label: label("", Color.fromRGBO(218, 0, 55, 1), 14),
-              onPressed: () async {
-                await context.read<Autentication>().signOut();
-                Navigator.pushNamed(context, '/home');
-              },
-            ),
-          ],
         ),
         body: Container(
             color: Colors.black12,
@@ -413,22 +300,6 @@ Widget Notificaciones(context, databaseService) {
                     mainAxisAlignment: MainAxisAlignment.start,
                     mainAxisSize: MainAxisSize.min,
                     children: <Widget>[
-                      Row(
-                        crossAxisAlignment: CrossAxisAlignment.end,
-                        mainAxisAlignment: MainAxisAlignment.end,
-                        children: [
-                          IconButton(
-                            icon: const Icon(
-                              Icons.close_sharp,
-                              color: Colors.red,
-                            ),
-                            tooltip: 'Increase volume by 10',
-                            onPressed: () {
-                              databaseService.EliminarNotificacion(lista[index].id);
-                            },
-                          ),
-                        ],
-                      ),
                       ListTile(
                         title: Text(dataNoti["name"].toString()),
                         subtitle: Text(dataNoti["subject"].toString()),

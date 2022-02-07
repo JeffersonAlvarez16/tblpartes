@@ -161,7 +161,7 @@ Widget ButonGuardar(_formKey, databaseService, context, hora, estado) {
         data["hora"] = hora;
         data["uid"] = uid;
         data["estado"] = false;
-        data["createAt"] = estado;
+        data["createAt"] = new DateTime.now();
 
         if (hora.toString().isNotEmpty) {
           int res = await validateExistencia(databaseService, hora);

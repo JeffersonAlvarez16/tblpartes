@@ -178,8 +178,8 @@ class _NewEditUsuariosState extends State<NewEditUsuarios> {
                           },
                           onSelected: (String selection) {
                             List<String> reasu = selection.split(",");
-                            dynamic lis = listaRes.where((element) => element["nombres"].toString().toLowerCase().trim() == reasu[0].toString().trim()).toList();
-
+                            dynamic lis = listaRes.where((element) => element["apellidos"].toString().toLowerCase().trim() == reasu[1].toString().trim()).toList();
+                            print(lis);
                             for (dynamic element in snapshot.data!.docs) {
                               String nombreCompleto = element.data()["nombres"].toString().toLowerCase() + ", " + element.data()["apellidos"].toString().toLowerCase();
                               if (nombreCompleto.contains(selection)) {
@@ -233,8 +233,16 @@ Widget ButonGuardar(_formKey, databaseService, context, nombre, uid_user, type_u
     'Comandante', */
         QuerySnapshot resultuser = await databaseService.existeUsuarioUid(uid_user);
         if (resultuser.size == 0) {
-          if (type_user == "Comandante" || type_user == "Sub comandante" || type_user == "Oficial de Semana") {
+          print("entro");
+          if (type_user == "Oficial de Semana") {
+            if (_formKey.currentState!.validate()) {
+              await databaseService.createUsuarios(uid_user, data);
+              Navigator.pop(context);
+            }
+          }
+          if (type_user == "Comandante" || type_user == "Sub comandante") {
             QuerySnapshot result = await databaseService.existeUsuario(type_user);
+            print(result);
             if (result.size == 0) {
               if (_formKey.currentState!.validate()) {
                 await databaseService.createUsuarios(uid_user, data);

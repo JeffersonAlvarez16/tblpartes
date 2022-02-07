@@ -54,8 +54,9 @@ class _EstadosParteState extends State<EstadosParte> {
     DateTime now = new DateTime.now();
     DateTime date = new DateTime(now.year, now.month, now.day);
     String fechaStr = new DateFormat("dd-MM-yyyy").format(date);
-    QuerySnapshot result = await databaseService.existenciaParte(fechaStr, widget.horaParte, widget.usuario.uid);
-
+    QuerySnapshot result = await databaseService.existenciaParte(fechaStr, widget.horaParte, widget.usuario.cedula);
+    print("consulta");
+    print(result.size);
     return result.size;
   }
 
@@ -281,7 +282,7 @@ class _EstadosParteState extends State<EstadosParte> {
                           onPressed: () async {
                             int res = await validateExistencia();
                             if (res == 1) {
-                              bool res = await ButonUpdateGuardia(widget.horaParte, widget.usuario.uid, widget.usuario.nombres, widget.usuario.apellidos, estado, widget.usuario.grado, widget.usuario.compania, databaseService, context);
+                              bool res = await ButonUpdateGuardia(widget.usuario.cedula, widget.horaParte, widget.usuario.uid, widget.usuario.nombres, widget.usuario.apellidos, estado, widget.usuario.grado, widget.usuario.compania, databaseService, context);
                               if (res == false) {
                               } else {
                                 final snackBar = SnackBar(content: Text('Se actualizo el parte de las: ' + widget.horaParte));
@@ -292,14 +293,17 @@ class _EstadosParteState extends State<EstadosParte> {
                                   listaW.clear();
                                 });
                               }
-                            } else {
-                              ButonGuardarGuardia(widget.horaParte, widget.usuario.uid, widget.usuario.nombres, widget.usuario.apellidos, estado, widget.usuario.grado, widget.usuario.compania, databaseService);
+                            } else if (res == 0) {
+                              ButonGuardarGuardia(widget.usuario.cedula, widget.horaParte, widget.usuario.uid, widget.usuario.nombres, widget.usuario.apellidos, estado, widget.usuario.grado, widget.usuario.compania, databaseService);
                               setState(() {
                                 seleccionado = false;
                                 estados[indexbefore].estado = false;
                                 listaW.clear();
                               });
                               final snackBar = SnackBar(content: Text('Se registro el parte correctamente'));
+                              ScaffoldMessenger.of(context).showSnackBar(snackBar);
+                            } else {
+                              final snackBar = SnackBar(content: Text('Error en registro, validar tu internet'));
                               ScaffoldMessenger.of(context).showSnackBar(snackBar);
                             }
                           },
@@ -312,7 +316,7 @@ class _EstadosParteState extends State<EstadosParte> {
                             if (notastr.length > 0) {
                               int res = await validateExistencia();
                               if (res == 1) {
-                                ButonUpdateGuardaNota(widget.horaParte, widget.usuario.uid, widget.usuario.nombres, widget.usuario.apellidos, notastr, estado, widget.usuario.grado, widget.usuario.compania, databaseService);
+                                ButonUpdateGuardaNota(widget.usuario.cedula, widget.horaParte, widget.usuario.uid, widget.usuario.nombres, widget.usuario.apellidos, notastr, estado, widget.usuario.grado, widget.usuario.compania, databaseService);
                                 setState(() {
                                   seleccionado = false;
                                   estados[indexbefore].estado = false;
@@ -320,14 +324,17 @@ class _EstadosParteState extends State<EstadosParte> {
                                 });
                                 final snackBar = SnackBar(content: Text('Se actualizo el parte de las: ' + widget.horaParte));
                                 ScaffoldMessenger.of(context).showSnackBar(snackBar);
-                              } else {
-                                ButonGuardarGuardaNota(widget.horaParte, widget.usuario.uid, widget.usuario.nombres, widget.usuario.apellidos, notastr, estado, widget.usuario.grado, widget.usuario.compania, databaseService);
+                              } else if (res == 0) {
+                                ButonGuardarGuardaNota(widget.usuario.cedula, widget.horaParte, widget.usuario.uid, widget.usuario.nombres, widget.usuario.apellidos, notastr, estado, widget.usuario.grado, widget.usuario.compania, databaseService);
                                 setState(() {
                                   seleccionado = false;
                                   estados[indexbefore].estado = false;
                                   listaW.clear();
                                 });
                                 final snackBar = SnackBar(content: Text('Se registro el parte correctamente'));
+                                ScaffoldMessenger.of(context).showSnackBar(snackBar);
+                              } else {
+                                final snackBar = SnackBar(content: Text('Error en registro, validar tu internet'));
                                 ScaffoldMessenger.of(context).showSnackBar(snackBar);
                               }
                             } else {
@@ -346,7 +353,7 @@ class _EstadosParteState extends State<EstadosParte> {
                                 if (notastr.length > 0) {
                                   int res = await validateExistencia();
                                   if (res == 1) {
-                                    ButonUpdateGuardaNotaFechas(widget.horaParte, desdeString, hastaString, widget.usuario.uid, widget.usuario.nombres, widget.usuario.apellidos, notastr, estado, widget.usuario.grado, widget.usuario.compania, databaseService);
+                                    ButonUpdateGuardaNotaFechas(widget.usuario.cedula, widget.horaParte, desdeString, hastaString, widget.usuario.uid, widget.usuario.nombres, widget.usuario.apellidos, notastr, estado, widget.usuario.grado, widget.usuario.compania, databaseService);
                                     setState(() {
                                       seleccionado = false;
                                       estados[indexbefore].estado = false;
@@ -354,14 +361,17 @@ class _EstadosParteState extends State<EstadosParte> {
                                     });
                                     final snackBar = SnackBar(content: Text('Se actualizo el parte de las: ' + widget.horaParte));
                                     ScaffoldMessenger.of(context).showSnackBar(snackBar);
-                                  } else {
-                                    ButonGuardarGuardaNotaFechas(widget.horaParte, desdeString, hastaString, widget.usuario.uid, widget.usuario.nombres, widget.usuario.apellidos, notastr, estado, widget.usuario.grado, widget.usuario.compania, databaseService);
+                                  } else if (res == 0) {
+                                    ButonGuardarGuardaNotaFechas(widget.usuario.cedula, widget.horaParte, desdeString, hastaString, widget.usuario.uid, widget.usuario.nombres, widget.usuario.apellidos, notastr, estado, widget.usuario.grado, widget.usuario.compania, databaseService);
                                     setState(() {
                                       seleccionado = false;
                                       estados[indexbefore].estado = false;
                                       listaW.clear();
                                     });
                                     final snackBar = SnackBar(content: Text('Se registro el parte correctamente'));
+                                    ScaffoldMessenger.of(context).showSnackBar(snackBar);
+                                  } else {
+                                    final snackBar = SnackBar(content: Text('Error en registro, validar tu internet'));
                                     ScaffoldMessenger.of(context).showSnackBar(snackBar);
                                   }
                                 } else {
@@ -389,7 +399,7 @@ class _EstadosParteState extends State<EstadosParte> {
                                   if (seleccion.length > 0) {
                                     int res = await validateExistencia();
                                     if (res == 1) {
-                                      ButonUpdateGuardaNotaFechasListado(seleccion, widget.horaParte, desdeString, hastaString, widget.usuario.uid, widget.usuario.nombres, widget.usuario.apellidos, notastr, estado, widget.usuario.grado, widget.usuario.compania, databaseService);
+                                      ButonUpdateGuardaNotaFechasListado(widget.usuario.cedula, seleccion, widget.horaParte, desdeString, hastaString, widget.usuario.uid, widget.usuario.nombres, widget.usuario.apellidos, notastr, estado, widget.usuario.grado, widget.usuario.compania, databaseService);
                                       setState(() {
                                         seleccionado = false;
                                         estados[indexbefore].estado = false;
@@ -397,14 +407,17 @@ class _EstadosParteState extends State<EstadosParte> {
                                       });
                                       final snackBar = SnackBar(content: Text('Se actualizo el parte de las: ' + widget.horaParte));
                                       ScaffoldMessenger.of(context).showSnackBar(snackBar);
-                                    } else {
-                                      ButonGuardarGuardaNotaFechasListado(seleccion, widget.horaParte, desdeString, hastaString, widget.usuario.uid, widget.usuario.nombres, widget.usuario.apellidos, notastr, estado, widget.usuario.grado, widget.usuario.compania, databaseService);
+                                    } else if (res == 0) {
+                                      ButonGuardarGuardaNotaFechasListado(widget.usuario.cedula, seleccion, widget.horaParte, desdeString, hastaString, widget.usuario.uid, widget.usuario.nombres, widget.usuario.apellidos, notastr, estado, widget.usuario.grado, widget.usuario.compania, databaseService);
                                       setState(() {
                                         seleccionado = false;
                                         estados[indexbefore].estado = false;
                                         listaW.clear();
                                       });
                                       final snackBar = SnackBar(content: Text('Se registro el parte correctamente'));
+                                      ScaffoldMessenger.of(context).showSnackBar(snackBar);
+                                    } else {
+                                      final snackBar = SnackBar(content: Text('Error en registro, validar tu internet'));
                                       ScaffoldMessenger.of(context).showSnackBar(snackBar);
                                     }
                                   } else {
@@ -449,7 +462,7 @@ class _EstadosParteState extends State<EstadosParte> {
   }
 }
 
-void ButonGuardarGuardia(horaParte, uidPersonal, nombres, apellidos, estado, rango, compania, databaseService) async {
+void ButonGuardarGuardia(cedula, horaParte, uidPersonal, nombres, apellidos, estado, rango, compania, databaseService) async {
   DateTime now = new DateTime.now();
   DateTime date = new DateTime(now.year, now.month, now.day);
   String desdeString = new DateFormat("dd-MM-yyyy").format(date);
@@ -465,6 +478,7 @@ void ButonGuardarGuardia(horaParte, uidPersonal, nombres, apellidos, estado, ran
   data["seleccion"] = "";
   data["contador"] = 0;
   data["nota"] = "";
+  data["cedula"] = cedula;
   data["desde"] = "";
   data["hasta"] = "";
   data["fechaRegistro"] = desdeString;
@@ -474,12 +488,14 @@ void ButonGuardarGuardia(horaParte, uidPersonal, nombres, apellidos, estado, ran
   await databaseService.createParte(uid, data);
 }
 
-Future<bool> ButonUpdateGuardia(horaParte, uidPersonal, nombres, apellidos, estado, rango, compania, databaseService, context) async {
+Future<bool> ButonUpdateGuardia(cedula, horaParte, uidPersonal, nombres, apellidos, estado, rango, compania, databaseService, context) async {
   DateTime now = new DateTime.now();
   DateTime date = new DateTime(now.year, now.month, now.day);
   String desdeString = new DateFormat("dd-MM-yyyy").format(date);
-  QuerySnapshot<Map<String, dynamic>> docu = await databaseService.existenciaParte(desdeString, horaParte, uidPersonal);
+  QuerySnapshot<Map<String, dynamic>> docu = await databaseService.existenciaParte(desdeString, horaParte, cedula);
+  print(docu.docs[0]);
   Map<String, dynamic> dataAnterior = docu.docs[0].data();
+
   final Map<String, dynamic> data = Map<String, dynamic>();
   data["uid"] = docu.docs[0].id;
   data["uid_personal"] = uidPersonal;
@@ -490,6 +506,7 @@ Future<bool> ButonUpdateGuardia(horaParte, uidPersonal, nombres, apellidos, esta
   data["compania"] = compania;
   data["seleccion"] = "";
   data["contador"] = 0;
+  data["cedula"] = cedula;
   data["nota"] = "";
   data["desde"] = "";
   data["hasta"] = "";
@@ -513,7 +530,7 @@ Future<bool> ButonUpdateGuardia(horaParte, uidPersonal, nombres, apellidos, esta
   }
 }
 
-void ButonGuardarGuardaNota(horaParte, uidPersonal, nombres, apellidos, nota, estado, rango, compania, databaseService) async {
+void ButonGuardarGuardaNota(cedula, horaParte, uidPersonal, nombres, apellidos, nota, estado, rango, compania, databaseService) async {
   DateTime now = new DateTime.now();
   DateTime date = new DateTime(now.year, now.month, now.day);
   String desdeString = new DateFormat("dd-MM-yyyy").format(date);
@@ -531,6 +548,7 @@ void ButonGuardarGuardaNota(horaParte, uidPersonal, nombres, apellidos, nota, es
   data["apellidos"] = apellidos;
   data["contador"] = 0;
   data["desde"] = "";
+  data["cedula"] = cedula;
   data["hasta"] = "";
   data["fechaRegistro"] = desdeString;
   data["hora_registro"] = horaParte;
@@ -538,11 +556,11 @@ void ButonGuardarGuardaNota(horaParte, uidPersonal, nombres, apellidos, nota, es
   await databaseService.createParte(uid, data);
 }
 
-Future<bool> ButonUpdateGuardaNota(horaParte, uidPersonal, nombres, apellidos, nota, estado, rango, compania, databaseService) async {
+Future<bool> ButonUpdateGuardaNota(cedula, horaParte, uidPersonal, nombres, apellidos, nota, estado, rango, compania, databaseService) async {
   DateTime now = new DateTime.now();
   DateTime date = new DateTime(now.year, now.month, now.day);
   String desdeString = new DateFormat("dd-MM-yyyy").format(date);
-  QuerySnapshot<Map<String, dynamic>> docu = await databaseService.existenciaParte(desdeString, horaParte, uidPersonal);
+  QuerySnapshot<Map<String, dynamic>> docu = await databaseService.existenciaParte(desdeString, horaParte, cedula);
   Map<String, dynamic> dataAnterior = docu.docs[0].data();
   final Map<String, dynamic> data = Map<String, dynamic>();
   data["uid"] = docu.docs[0].id;
@@ -553,6 +571,7 @@ Future<bool> ButonUpdateGuardaNota(horaParte, uidPersonal, nombres, apellidos, n
   data["compania"] = compania;
   data["nota"] = nota;
   data["seleccion"] = "";
+  data["cedula"] = cedula;
   data["apellidos"] = apellidos;
   data["contador"] = 0;
   data["desde"] = "";
@@ -569,7 +588,7 @@ Future<bool> ButonUpdateGuardaNota(horaParte, uidPersonal, nombres, apellidos, n
   }
 }
 
-void ButonGuardarGuardaNotaFechas(horaParte, desde, hasta, uidPersonal, nombres, apellidos, nota, estado, rango, compania, databaseService) async {
+void ButonGuardarGuardaNotaFechas(cedula, horaParte, desde, hasta, uidPersonal, nombres, apellidos, nota, estado, rango, compania, databaseService) async {
   DateTime now = new DateTime.now();
   DateTime date = new DateTime(now.year, now.month, now.day);
   String desdeString = new DateFormat("dd-MM-yyyy").format(date);
@@ -585,6 +604,7 @@ void ButonGuardarGuardaNotaFechas(horaParte, desde, hasta, uidPersonal, nombres,
   data["apellidos"] = apellidos;
   data["seleccion"] = "";
   data["contador"] = 0;
+  data["cedula"] = cedula;
   data["desde"] = desde;
   data["hasta"] = hasta;
   data["fechaRegistro"] = desdeString;
@@ -594,11 +614,11 @@ void ButonGuardarGuardaNotaFechas(horaParte, desde, hasta, uidPersonal, nombres,
   await databaseService.createParte(uid, data);
 }
 
-Future<bool> ButonUpdateGuardaNotaFechas(horaParte, desde, hasta, uidPersonal, nombres, apellidos, nota, estado, rango, compania, databaseService) async {
+Future<bool> ButonUpdateGuardaNotaFechas(cedula, horaParte, desde, hasta, uidPersonal, nombres, apellidos, nota, estado, rango, compania, databaseService) async {
   DateTime now = new DateTime.now();
   DateTime date = new DateTime(now.year, now.month, now.day);
   String desdeString = new DateFormat("dd-MM-yyyy").format(date);
-  QuerySnapshot<Map<String, dynamic>> docu = await databaseService.existenciaParte(desdeString, horaParte, uidPersonal);
+  QuerySnapshot<Map<String, dynamic>> docu = await databaseService.existenciaParte(desdeString, horaParte, cedula);
   Map<String, dynamic> dataAnterior = docu.docs[0].data();
   final Map<String, dynamic> data = Map<String, dynamic>();
   data["uid"] = docu.docs[0].id;
@@ -609,6 +629,7 @@ Future<bool> ButonUpdateGuardaNotaFechas(horaParte, desde, hasta, uidPersonal, n
   data["compania"] = compania;
   data["nota"] = nota;
   data["apellidos"] = apellidos;
+  data["cedula"] = cedula;
   data["seleccion"] = "";
   data["contador"] = 0;
   data["desde"] = desde;
@@ -626,7 +647,7 @@ Future<bool> ButonUpdateGuardaNotaFechas(horaParte, desde, hasta, uidPersonal, n
   }
 }
 
-void ButonGuardarGuardaNotaFechasListado(seleccion, horaParte, desde, hasta, uidPersonal, nombres, apellidos, nota, estado, rango, compania, databaseService) async {
+void ButonGuardarGuardaNotaFechasListado(cedula, seleccion, horaParte, desde, hasta, uidPersonal, nombres, apellidos, nota, estado, rango, compania, databaseService) async {
   DateTime now = new DateTime.now();
   DateTime date = new DateTime(now.year, now.month, now.day);
   String desdeString = new DateFormat("dd-MM-yyyy").format(date);
@@ -640,6 +661,7 @@ void ButonGuardarGuardaNotaFechasListado(seleccion, horaParte, desde, hasta, uid
   data["compania"] = compania;
   data["nota"] = nota;
   data["apellidos"] = apellidos;
+  data["cedula"] = cedula;
   data["seleccion"] = seleccion;
   data["contador"] = 0;
   data["desde"] = desde;
@@ -650,11 +672,11 @@ void ButonGuardarGuardaNotaFechasListado(seleccion, horaParte, desde, hasta, uid
   await databaseService.createParte(uid, data);
 }
 
-Future<bool> ButonUpdateGuardaNotaFechasListado(seleccion, horaParte, desde, hasta, uidPersonal, nombres, apellidos, nota, estado, rango, compania, databaseService) async {
+Future<bool> ButonUpdateGuardaNotaFechasListado(cedula, seleccion, horaParte, desde, hasta, uidPersonal, nombres, apellidos, nota, estado, rango, compania, databaseService) async {
   DateTime now = new DateTime.now();
   DateTime date = new DateTime(now.year, now.month, now.day);
   String desdeString = new DateFormat("dd-MM-yyyy").format(date);
-  QuerySnapshot<Map<String, dynamic>> docu = await databaseService.existenciaParte(desdeString, horaParte, uidPersonal);
+  QuerySnapshot<Map<String, dynamic>> docu = await databaseService.existenciaParte(desdeString, horaParte, cedula);
   Map<String, dynamic> dataAnterior = docu.docs[0].data();
   final Map<String, dynamic> data = Map<String, dynamic>();
   data["uid"] = docu.docs[0].id;
@@ -665,6 +687,7 @@ Future<bool> ButonUpdateGuardaNotaFechasListado(seleccion, horaParte, desde, has
   data["compania"] = compania;
   data["nota"] = nota;
   data["apellidos"] = apellidos;
+  data["cedula"] = cedula;
   data["seleccion"] = seleccion;
   data["contador"] = 0;
   data["desde"] = desde;

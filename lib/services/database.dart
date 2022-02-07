@@ -57,7 +57,7 @@ class DatabaseService {
   }
 
   Future<void> createParte(String uid, Map<String, dynamic> parte) async {
-    await firestore.collection("personal").doc(parte["uid_personal"]).update({"desde": parte["desde"], "hasta": parte["hasta"], "estado": parte["estado"]});
+    await firestore.collection("personal").doc(parte["uid_personal"]).update({"nota": parte["nota"], "desde": parte["desde"], "hasta": parte["hasta"], "estado": parte["estado"]});
     return await firestore.collection("partes").doc(uid).set(parte);
   }
 
@@ -71,6 +71,17 @@ class DatabaseService {
       return respuesta["result"].toString();
     } else {
       return "null";
+    }
+  }
+
+  Future<bool> deleteUserUid(String uid) async {
+    var url = Uri.parse('https://us-central1-tbl-partes.cloudfunctions.net/deleteUserUid');
+    dynamic response = await http.post(url, body: {"uid": uid});
+    dynamic respuesta = json.decode(response.body);
+    if (response.statusCode == 200) {
+      return true;
+    } else {
+      return false;
     }
   }
 
@@ -92,6 +103,7 @@ class DatabaseService {
   }
 
   Future<void> eliminarPersonal(String uid) async {
+    await deleteUserUid(uid);
     return await firestore.collection("personal").doc(uid).delete();
   }
 
@@ -195,7 +207,7 @@ class DatabaseService {
 
       String json = jsonEncode(doc.data());
       Map<String, dynamic> personal = jsonDecode(json);
-      return UserModel.fromUserModel(uid: personal['uid'] ?? "", hasta: personal["hasta"] ?? "", token: personal["token"] ?? "", apellidos: personal['apellidos'] ?? '', grado: personal['grado'] ?? '', nombres: personal['nombres'] ?? '', batallon: personal['batallon'] ?? '', compania: personal['compania'] ?? '', email: personal['email'] ?? '', typeUser: personal['typeUser'] ?? '', cedula: personal['cedula'] ?? '');
+      return UserModel.fromUserModel(uid: personal['uid'] ?? "", hasta: personal["hasta"] ?? "", token: personal["token"] ?? "", apellidos: personal['apellidos'] ?? '', grado: personal['grado'] ?? '', nombres: personal['nombres'] ?? '', batallon: personal['batallon'] ?? '', compania: personal['compania'] ?? '', email: personal['email'] ?? '', typeUser: personal['typeUser'] ?? '', cedula: personal['cedula'] ?? '', estado: personal['estado'] ?? '');
     }).toList();
   }
 
@@ -224,15 +236,17 @@ class DatabaseService {
 
   List<Usuarios> usuariosListFromSnapshot(QuerySnapshot snapshot) {
     return snapshot.docs.map((doc) {
-      //print(doc.data);
+      //print(doc.data);doc
 
+      String id = doc.id;
       String json = jsonEncode(doc.data());
       Map<String, dynamic> usuarios = jsonDecode(json);
+      print(usuarios);
       return Usuarios(
         uid_user: usuarios['uid_user'] ?? '',
         type_user: usuarios['type_user'] ?? "",
         nombres: usuarios['nombres'] ?? false,
-        uid: usuarios['uid'] ?? false,
+        uid: id,
         compania: usuarios['compania'] ?? "",
         cedula: usuarios['cedula'] ?? "",
         correo: usuarios['correo'] ?? "",
@@ -302,7 +316,7 @@ class DatabaseService {
   }
 
   Future<QuerySnapshot<Map<String, dynamic>>> existenciaParte(String fecha, String hora, String uidPersonal) async {
-    return await firestore.collection("partes").where("uid_personal", isEqualTo: uidPersonal).where("fechaRegistro", isEqualTo: fecha).where("hora_registro", isEqualTo: hora).get();
+    return await firestore.collection("partes").where("cedula", isEqualTo: uidPersonal).where("fechaRegistro", isEqualTo: fecha).where("hora_registro", isEqualTo: hora).get();
   }
 
   Future saveNotification(String compania, String estado, String nombres, String apellidos, String horario, String parteAnterior, String idParte, String uid_personal, desde, hasta) async {
@@ -318,9 +332,9 @@ class DatabaseService {
       String token = data!["token"];
       String mensaje = "";
       if (desde.toString().length > 0) {
-        mensaje = "El Sr. $nombres $apellidos desea hacer el cambio de esatado a $estado en el parte de: $horario, del dia $desdeString desde ña fecha $desde hasta $hasta";
+        mensaje = "El Sr. $nombres $apellidos desea hacer el cambio de estado a $estado en el parte de: $horario, del dia $desdeString desde la fecha $desde hasta $hasta";
       } else {
-        mensaje = "El Sr. $nombres $apellidos desea hacer el cambio de esatado a $estado en el parte de: $horario, del dia $desdeString";
+        mensaje = "El Sr. $nombres $apellidos desea hacer el cambio de estado a $estado en el parte de: $horario, del dia $desdeString";
       }
       return await firestore.collection("notification").add({"name": "Autorización de cambio de estado en el parte", "subject": mensaje, "token": token, "parte_anterior": parteAnterior, "parte_nuevo": estado, "uid": dataUser["uid"], "estado": "en_espera", "create": FieldValue.serverTimestamp(), "id_parte": idParte, "atendido": false, "uid_personal": uid_personal});
     } catch (e) {
@@ -370,6 +384,10 @@ class DatabaseService {
 
   Future cambiarEstadoNotiUser(String notificacion) async {
     return await firestore.collection("notifications").doc(notificacion).update({"atendido": true});
+  }
+
+  Future EliminarNotificacion(String notificacion) async {
+    return await firestore.collection("notifications").doc(notificacion).delete();
   }
 
   Future cambiarEstadoHorarios(String id) async {

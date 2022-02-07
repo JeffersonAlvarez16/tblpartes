@@ -39,7 +39,7 @@ class _AdminPersonalState extends State<AdminPersonal> {
                     context,
                     MaterialPageRoute(builder: (context) {
                       return NewEditPersonal(
-                        userModel: new UserModel.fromUserModel(uid: "", hasta: "", grado: "", apellidos: "", nombres: "", batallon: "", compania: "", token: "", email: "", cedula: "", typeUser: ""),
+                        userModel: new UserModel.fromUserModel(uid: "", hasta: "", grado: "", apellidos: "", nombres: "", batallon: "", compania: "", token: "", email: "", cedula: "", typeUser: "", estado: "Falto"),
                       );
                     }),
                   );

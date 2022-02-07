@@ -354,6 +354,9 @@ Widget ButonGuardar(_formKey, databaseService, context, grado, apellidos, nombre
         data["typeUser"] = "personal";
         data["cedula"] = cedula;
         data["password"] = password;
+        data["estado"] = "Falto";
+        data["desde"] = "";
+        data["hasta"] = "";
         if (_formKey.currentState!.validate()) {
           await databaseService.createPersonal(uid, data);
           //await enviarEmail(email, password, nombres);

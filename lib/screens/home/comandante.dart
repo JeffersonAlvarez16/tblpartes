@@ -347,7 +347,7 @@ class _ComandanteState extends State<Comandante> with AutomaticKeepAliveClientMi
         stream: FirebaseFirestore.instance.collection("horarios").where("estado", isEqualTo: true).snapshots(),
         builder: (context, AsyncSnapshot<QuerySnapshot<Map<String, dynamic>>> snapshot) {
           if (!snapshot.hasData) {
-            return CircularProgressIndicator();
+            return Text("");
           }
           if (snapshot.hasData && snapshot.connectionState == ConnectionState.active) {
             Map<String, dynamic> data = snapshot.data!.docs[0].data();
@@ -358,7 +358,7 @@ class _ComandanteState extends State<Comandante> with AutomaticKeepAliveClientMi
               hora: hora,
             );
           }
-          return CircularProgressIndicator();
+          return Text("");
         },
       ),
       SingleChildScrollView(
@@ -442,7 +442,7 @@ class _ComandanteState extends State<Comandante> with AutomaticKeepAliveClientMi
                 stream: streamServices.horariosString,
                 builder: (context, AsyncSnapshot<List<String>> snapshot) {
                   if (!snapshot.hasData) {
-                    return CircularProgressIndicator();
+                    return Text("");
                   }
                   if (snapshot.connectionState == ConnectionState.active && snapshot.hasData) {
                     List<String>? lisTem = snapshot.data;
@@ -544,7 +544,7 @@ class _ComandanteState extends State<Comandante> with AutomaticKeepAliveClientMi
                 stream: streamServices.estadosString,
                 builder: (context, AsyncSnapshot<List<String>> snapshot) {
                   if (!snapshot.hasData) {
-                    return CircularProgressIndicator();
+                    return Text("");
                   }
                   if (snapshot.connectionState == ConnectionState.active && snapshot.hasData) {
                     List<String>? lisTem = snapshot.data;
@@ -646,7 +646,7 @@ class _ComandanteState extends State<Comandante> with AutomaticKeepAliveClientMi
                 stream: streamServices.companiaStringString,
                 builder: (context, AsyncSnapshot<List<String>> snapshot) {
                   if (!snapshot.hasData) {
-                    return CircularProgressIndicator();
+                    return Text("");
                   }
                   if (snapshot.connectionState == ConnectionState.active && snapshot.hasData) {
                     List<String>? lisTem = snapshot.data;
@@ -755,7 +755,7 @@ class _ComandanteState extends State<Comandante> with AutomaticKeepAliveClientMi
             stream: urlSeacrh,
             builder: (context, AsyncSnapshot<QuerySnapshot<Map<String, dynamic>>> snapshot) {
               if (!snapshot.hasData) {
-                return CircularProgressIndicator();
+                return Text("");
               }
               if (snapshot.connectionState == ConnectionState.active) {
                 List<dynamic> list = snapshot.data!.docs.map((DocumentSnapshot doc) {
@@ -791,8 +791,8 @@ class _ComandanteState extends State<Comandante> with AutomaticKeepAliveClientMi
                 } else {
                   return ListView.builder(
                     shrinkWrap: true,
-                    physics: NeverScrollableScrollPhysics(),
                     itemCount: listrep.length,
+                    physics: NeverScrollableScrollPhysics(),
                     itemBuilder: (context, index) {
                       return Container(
                           padding: EdgeInsets.only(top: 10),
@@ -830,7 +830,7 @@ class _ComandanteState extends State<Comandante> with AutomaticKeepAliveClientMi
             stream: FirebaseFirestore.instance.collection("partes").where("fechaRegistro", isEqualTo: desdeString).snapshots(),
             builder: (context, AsyncSnapshot<QuerySnapshot<Map<String, dynamic>>> snapshot) {
               if (!snapshot.hasData) {
-                return CircularProgressIndicator();
+                return Text("");
               }
               if (snapshot.connectionState == ConnectionState.active) {
                 List<dynamic> list = snapshot.data!.docs.map((DocumentSnapshot doc) {
@@ -992,6 +992,7 @@ class _ComandanteState extends State<Comandante> with AutomaticKeepAliveClientMi
           ),
         ),
         actions: <Widget>[
+          label("Versión 1.5", Colors.white, 9),
           TextButton.icon(
             icon: Icon(
               Icons.logout_outlined,
@@ -1044,7 +1045,7 @@ class _ListaState extends State<_Lista> with AutomaticKeepAliveClientMixin {
               return SingleChildScrollView(
                 scrollDirection: Axis.horizontal,
                 child: DataTable(
-                  dataRowHeight: 80,
+                  dataRowHeight: 90,
                   dataTextStyle: TextStyle(fontSize: 12, color: Colors.black),
                   headingTextStyle: TextStyle(fontSize: 12, color: Colors.black, fontWeight: FontWeight.bold),
                   columns: const <DataColumn>[
@@ -1052,10 +1053,14 @@ class _ListaState extends State<_Lista> with AutomaticKeepAliveClientMixin {
                     DataColumn(label: Text('Grado')),
                     DataColumn(label: Text('Apellidos\ny Nombres')),
                     DataColumn(label: Text('Horario\nparte')),
+                    DataColumn(label: Text('Estado')),
                     DataColumn(label: Text('Observacion')),
+                    DataColumn(label: Text('Desde')),
+                    DataColumn(label: Text('Hasta')),
                   ],
                   rows: lt!.map((e) {
                     var index = lt.indexOf(e);
+                    print(e);
                     return DataRow(cells: [
                       DataCell(Text((index + 1).toString())),
                       DataCell(Text(e["rango"])),
@@ -1067,13 +1072,32 @@ class _ListaState extends State<_Lista> with AutomaticKeepAliveClientMixin {
                       DataCell(
                         Text(e["estado"]),
                       ),
+                      DataCell(
+                        Container(
+                          width: 100,
+                          child: Text(e["nota"] ?? ""),
+                        ),
+                      ),
+                      DataCell(
+                        Text(e["desde"] ?? ""),
+                      ),
+                      DataCell(
+                        Text(e["hasta"] ?? ""),
+                      ),
                     ]);
                   }).toList(),
                 ),
               );
             }
+
+            if (!snapshot.hasData) {
+              return Container(
+                margin: EdgeInsets.only(left: 24, top: 24),
+                child: Text("Cargando reporte"),
+              );
+            }
             widget.lista.add(widget.listaTest);
-            return CircularProgressIndicator();
+            return Text("");
           },
         )
       ],
@@ -1149,7 +1173,7 @@ class _HomeState extends State<_Home> with AutomaticKeepAliveClientMixin {
           stream: FirebaseFirestore.instance.collection("partes").where("fechaRegistro", isEqualTo: desdeString).where("hora_registro", isEqualTo: widget.hora).snapshots(),
           builder: (context, AsyncSnapshot<QuerySnapshot<Map<String, dynamic>>> snapshot) {
             if (!snapshot.hasData) {
-              return CircularProgressIndicator();
+              return Text("");
             }
             if (snapshot.connectionState == ConnectionState.active) {
               print(snapshot.data!.size);
@@ -1181,10 +1205,11 @@ class _HomeState extends State<_Home> with AutomaticKeepAliveClientMixin {
               //return Text("data");
 
               return Container(
-                  padding: EdgeInsets.only(left: 56, top: 12),
+                  padding: EdgeInsets.only(left: 24, top: 12),
                   child: Column(children: [
                     ListView.builder(
                       shrinkWrap: true,
+                      physics: NeverScrollableScrollPhysics(),
                       itemCount: listrep.length,
                       itemBuilder: (context, index) {
                         return Container(
@@ -1259,6 +1284,7 @@ List<dynamic> filtrarLista(List<dynamic> lista) {
   List<dynamic> listaFilter = [];
   for (var item in listaOrden) {
     for (var itemParte in lista) {
+      print(itemParte);
       if (itemParte["rango"] == item) {
         listaFilter.add(itemParte);
       }
@@ -1317,12 +1343,10 @@ class _BuscarParteState extends State<_BuscarParte> {
                     if (listaTemp.length > 10) {
                       setState(() {
                         lista = listaTemp.sublist(0, 10);
-                        ;
                       });
                     } else {
                       setState(() {
                         lista = listaTemp;
-                        ;
                       });
                     }
                   }
@@ -1342,10 +1366,14 @@ class _BuscarParteState extends State<_BuscarParte> {
                   DataColumn(label: Text('Grado')),
                   DataColumn(label: Text('Apellidos\ny Nombres')),
                   DataColumn(label: Text('Horario\nparte')),
-                  DataColumn(label: Text('Observacion')),
+                  DataColumn(label: Text('Estado')),
+                  DataColumn(label: Text('Observación')),
+                  DataColumn(label: Text('Desde')),
+                  DataColumn(label: Text('Hasta')),
                 ],
                 rows: lista.map((e) {
                   var index = lista.indexOf(e);
+                  print(e);
                   return DataRow(cells: [
                     DataCell(Text((index + 1).toString())),
                     DataCell(Text(e["rango"])),
@@ -1356,6 +1384,15 @@ class _BuscarParteState extends State<_BuscarParte> {
                     DataCell(Text(e["hora_registro"])),
                     DataCell(
                       Text(e["estado"]),
+                    ),
+                    DataCell(
+                      Text(e["nota"] ?? ""),
+                    ),
+                    DataCell(
+                      Text(e["desde"] ?? ""),
+                    ),
+                    DataCell(
+                      Text(e["hasta"] ?? ""),
                     ),
                   ]);
                 }).toList(),
@@ -1371,7 +1408,7 @@ Widget Notificaciones(context, databaseService) {
     builder: (context, snapshot) {
       if (!snapshot.hasData) {
         return Center(
-          child: Text("Cargango"),
+          child: Text("Cargando"),
         );
       }
       if (snapshot.connectionState == ConnectionState.active && snapshot.hasData) {
@@ -1411,6 +1448,13 @@ Widget Notificaciones(context, databaseService) {
                       Container(
                         padding: EdgeInsets.only(left: 16),
                         child: Text("Parte Actual: " + dataNoti["parte_nuevo"]),
+                      ),
+                      SizedBox(
+                        height: 12,
+                      ),
+                      Container(
+                        padding: EdgeInsets.only(left: 16),
+                        child: Text("Nota: " + (dataNoti["nota"].toString() == "null" ? "" : dataNoti["nota"].toString())),
                       ),
                       SizedBox(
                         height: 16,
@@ -1489,7 +1533,7 @@ Widget Notificaciones(context, databaseService) {
         );
       }
       return Center(
-        child: Text("Cargango"),
+        child: Text("Cargando"),
       );
     },
   ));

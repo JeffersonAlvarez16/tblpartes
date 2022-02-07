@@ -53,6 +53,7 @@ class AuthService with ChangeNotifier {
 
   Future signOuta() async {
     await _auth.signOut();
+
     _status = AuthStatus.Unauthenticated;
     notifyListeners();
   }

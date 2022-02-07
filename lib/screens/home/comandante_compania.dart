@@ -514,6 +514,7 @@ class _ComandanteCompaniaState extends State<ComandanteCompania> {
                               padding: EdgeInsets.only(left: 12, top: 12),
                               child: Column(children: [
                                 ListView.builder(
+                                  physics: NeverScrollableScrollPhysics(),
                                   shrinkWrap: true,
                                   itemCount: listrep.length,
                                   itemBuilder: (context, index) {
@@ -562,7 +563,10 @@ class _ComandanteCompaniaState extends State<ComandanteCompania> {
                                             DataColumn(label: Text('Grado')),
                                             DataColumn(label: Text('Apellidos\ny Nombres')),
                                             DataColumn(label: Text('Horario\nparte')),
-                                            DataColumn(label: Text('Observacion')),
+                                            DataColumn(label: Text('Estado')),
+                                            DataColumn(label: Text('Observación')),
+                                            DataColumn(label: Text('Desde')),
+                                            DataColumn(label: Text('Hasta')),
                                           ],
                                           rows: lt!.map((e) {
                                             var index = lt.indexOf(e);
@@ -576,6 +580,15 @@ class _ComandanteCompaniaState extends State<ComandanteCompania> {
                                               DataCell(Text(e["hora_registro"])),
                                               DataCell(
                                                 Text(e["estado"]),
+                                              ),
+                                              DataCell(
+                                                Text(e["nota"] ?? ""),
+                                              ),
+                                              DataCell(
+                                                Text(e["desde"] ?? ""),
+                                              ),
+                                              DataCell(
+                                                Text(e["hasta"] ?? ""),
                                               ),
                                             ]);
                                           }).toList(),
@@ -1053,7 +1066,8 @@ class _ComandanteCompaniaState extends State<ComandanteCompania> {
                 'Comandante de Compañia',
                 style: TextStyle(fontFamily: "Lato", fontWeight: FontWeight.bold, color: Colors.white, fontSize: 14),
               ),
-              label(widget.arguments["compania"], Colors.white, 10)
+              label(widget.arguments["compania"], Colors.white, 10),
+              label("Versión 1.5", Colors.white, 9),
             ],
           ),
         ),
@@ -1222,7 +1236,7 @@ Widget Notificaciones(context, databaseService) {
         builder: (context, snapshot) {
           if (!snapshot.hasData) {
             return Center(
-              child: Text("Cargango"),
+              child: Text("Cargando"),
             );
           }
           if (snapshot.connectionState == ConnectionState.active && snapshot.hasData) {
@@ -1231,12 +1245,13 @@ Widget Notificaciones(context, databaseService) {
             return Container(
               height: MediaQuery.of(context).size.height,
               width: MediaQuery.of(context).size.width,
-              padding: EdgeInsets.only(bottom: 150),
+              padding: EdgeInsets.only(bottom: 150, top: 10),
               child: ListView.builder(
                 shrinkWrap: true,
                 itemCount: lista.length,
                 itemBuilder: (context, index) {
                   Map<String, dynamic> dataNoti = lista[index].data();
+                  print(dataNoti["nota"].toString());
 
                   return Card(
                     child: Container(
@@ -1244,7 +1259,7 @@ Widget Notificaciones(context, databaseService) {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         mainAxisAlignment: MainAxisAlignment.start,
-                        mainAxisSize: MainAxisSize.min,
+                        mainAxisSize: MainAxisSize.max,
                         children: <Widget>[
                           ListTile(
                             title: Text(dataNoti["name"].toString()),
@@ -1263,6 +1278,13 @@ Widget Notificaciones(context, databaseService) {
                           Container(
                             padding: EdgeInsets.only(left: 16),
                             child: Text("Parte Actual: " + dataNoti["parte_nuevo"]),
+                          ),
+                          SizedBox(
+                            height: 12,
+                          ),
+                          Container(
+                            padding: EdgeInsets.only(left: 16),
+                            child: Text("Nota: " + (dataNoti["nota"].toString() == "null" ? "" : dataNoti["nota"].toString())),
                           ),
                           SizedBox(
                             height: 16,
@@ -1341,7 +1363,7 @@ Widget Notificaciones(context, databaseService) {
             );
           }
           return Center(
-            child: Text("Cargango"),
+            child: Text("Cargando"),
           );
         },
       ));

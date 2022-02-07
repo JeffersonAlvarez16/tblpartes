@@ -149,12 +149,15 @@ class _SignInState extends State<SignIn> {
                                             style: TextStyle(color: Colors.white),
                                           ),
                                           onPressed: () async {
+                                            await context.read<Autentication>().signOut();
                                             setState(() {
                                               cargando = true;
                                             });
                                             FocusScope.of(context).unfocus();
                                             if (_formKey.currentState!.validate()) {
                                               var correo = await databaseService.getCorreo(email);
+                                              print("correo");
+                                              print(correo);
                                               if (correo == "null") {
                                                 final snackBar = SnackBar(content: Text('Debe ingresar los datos validos'));
                                                 ScaffoldMessenger.of(context).showSnackBar(snackBar);
@@ -162,13 +165,13 @@ class _SignInState extends State<SignIn> {
                                                   cargando = false;
                                                 });
                                               } else {
-                                                await context.read<Autentication>().signOut();
-                                                dynamic result = context.read<Autentication>().signIn(
+                                                dynamic result = await context.read<Autentication>().signIn(
                                                       email: correo,
                                                       password: password,
                                                     );
-                                                Navigator.pushNamed(context, '/home');
-                                                if (result == null) {
+                                                if (result == "Logeado") Navigator.pushNamed(context, '/home');
+
+                                                if (result != "Logeado") {
                                                   final snackBar = SnackBar(content: Text('Contraseña incorrecta'));
                                                   ScaffoldMessenger.of(context).showSnackBar(snackBar);
                                                   setState(() {
@@ -199,7 +202,15 @@ class _SignInState extends State<SignIn> {
                                     },
                                     child: label("Recuperar Contraseña", Colors.redAccent, 16),
                                   ),
-                                )
+                                ),
+                                SizedBox(
+                                  height: 12,
+                                ),
+                                Container(
+                                    child: Text(
+                                  "Versión 1.5",
+                                  style: TextStyle(color: Colors.white),
+                                ))
                               ],
                             ),
                           ))),
